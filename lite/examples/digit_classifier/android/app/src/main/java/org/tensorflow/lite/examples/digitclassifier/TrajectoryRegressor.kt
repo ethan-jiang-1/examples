@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
+import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -13,7 +14,6 @@ import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-import org.tensorflow.lite.Interpreter
 
 class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
@@ -69,12 +69,29 @@ class TrajectoryRegressor(private val context: Context) {
   @Throws(IOException::class)
   private fun loadModelFile(assetManager: AssetManager): ByteBuffer {
     Log.i(TAG, "TrajectoryRegressor:loadModelFile")
-    val fileDescriptor = assetManager.openFd(MODEL_FILE)
+
+    var model_file = getModelFileName(assetManager)
+    val fileDescriptor = assetManager.openFd(model_file)
     val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
     val fileChannel = inputStream.channel
     val startOffset = fileDescriptor.startOffset
     val declaredLength = fileDescriptor.declaredLength
     return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength)
+  }
+
+  @Throws(IOException::class)
+  private fun readJsonAsset(assetManager: AssetManager, fileName: String): String {
+    val file = assetManager.open(fileName)
+    val formArray = ByteArray(file.available())
+    file.read(formArray)
+    file.close()
+    return String(formArray)
+  }
+
+  private fun getModelFileName(assetManager: AssetManager): String {
+      var json_str = readJsonAsset(assetManager, "tfl_info.json")
+      Log.w(TAG, json_str)
+      return MODEL_FILE
   }
 
   private fun classify(bitmap: Bitmap): String {

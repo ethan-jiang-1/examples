@@ -1,0 +1,13 @@
+{
+    "model": "Mw_heavyClNdz6q_eval.hdf5.tflite",
+    "imu_files": [
+        "ds1-ds_NCLT-2012-01-08_04-imu.csv",
+        "ds1-ds_NCLT-2012-01-08_09-imu.csv",
+        "ds1-ds_NCLT-2012-01-08_14-imu.csv",
+        "ds1-ds_NCLT-2012-06-15_04-imu.csv",
+        "ds1-ds_NCLT-2012-06-15_09-imu.csv",
+        "ds1-ds_NCLT-2013-01-10_02-imu.csv"
+    ],
+    "dataset_name": "nclt",
+    "sample_step": 20
+}
