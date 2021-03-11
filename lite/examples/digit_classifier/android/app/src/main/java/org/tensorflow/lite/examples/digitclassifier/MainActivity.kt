@@ -22,6 +22,8 @@ class MainActivity : AppCompatActivity() {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.tfe_dc_activity_main)
 
+    Log.e(TAG, "Error!!!!!!")
+
     // Setup view instances
     drawView = findViewById(R.id.draw_view)
     drawView?.setStrokeWidth(70.0f)

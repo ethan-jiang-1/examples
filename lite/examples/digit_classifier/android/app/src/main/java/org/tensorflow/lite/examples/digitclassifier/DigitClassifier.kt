@@ -31,6 +31,7 @@ class DigitClassifier(private val context: Context) {
     val task = TaskCompletionSource<Void>()
     executorService.execute {
       try {
+
         initializeInterpreter()
         task.setResult(null)
       } catch (e: IOException) {
@@ -42,6 +43,7 @@ class DigitClassifier(private val context: Context) {
 
   @Throws(IOException::class)
   private fun initializeInterpreter() {
+    Log.d(TAG, "Initial TFList started...")
     // Load the TF Lite model
     val assetManager = context.assets
     val model = loadModelFile(assetManager)
@@ -74,6 +76,8 @@ class DigitClassifier(private val context: Context) {
   }
 
   private fun classify(bitmap: Bitmap): String {
+    Log.d(TAG, "classify!!!!!")
+
     if (!isInitialized) {
       throw IllegalStateException("TF Lite Interpreter is not initialized yet.")
     }
@@ -90,9 +94,15 @@ class DigitClassifier(private val context: Context) {
 
     startTime = System.nanoTime()
     val result = Array(1) { FloatArray(OUTPUT_CLASSES_COUNT) }
-    interpreter?.run(byteBuffer, result)
+
+    var loopmax = 100
+    for (i in 1..loopmax) {
+      interpreter?.run(byteBuffer, result)
+    }
     elapsedTime = (System.nanoTime() - startTime) / 1000000
-    Log.d(TAG, "Inference time = " + elapsedTime + "ms")
+
+    Log.d(TAG, "Inference time = " + elapsedTime + "ms" + " within loop " + loopmax)
+    Log.d(TAG, getOutputString(result[0]))
 
     return getOutputString(result[0])
   }
