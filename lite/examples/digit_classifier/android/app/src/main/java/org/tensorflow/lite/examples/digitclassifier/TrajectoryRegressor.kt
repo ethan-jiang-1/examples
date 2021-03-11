@@ -15,7 +15,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import org.tensorflow.lite.Interpreter
 
-class DigitClassifier(private val context: Context) {
+class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
   var isInitialized = false
     private set
@@ -28,7 +28,7 @@ class DigitClassifier(private val context: Context) {
   private var modelInputSize: Int = 0 // will be inferred from TF Lite model
 
   fun initialize(): Task<Void> {
-    Log.i(TAG, "DigitClassifier:initialize")
+    Log.i(TAG, "TrajectoryRegressor:initialize")
     val task = TaskCompletionSource<Void>()
     executorService.execute {
       try {
@@ -44,7 +44,7 @@ class DigitClassifier(private val context: Context) {
 
   @Throws(IOException::class)
   private fun initializeInterpreter() {
-    Log.i(TAG, "DigitClassifier:initializeInterpreter, Initial TFList started...")
+    Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
     // Load the TF Lite model
     val assetManager = context.assets
     val model = loadModelFile(assetManager)
@@ -68,7 +68,7 @@ class DigitClassifier(private val context: Context) {
 
   @Throws(IOException::class)
   private fun loadModelFile(assetManager: AssetManager): ByteBuffer {
-    Log.i(TAG, "DigitClassifier:loadModelFile")
+    Log.i(TAG, "TrajectoryRegressor:loadModelFile")
     val fileDescriptor = assetManager.openFd(MODEL_FILE)
     val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
     val fileChannel = inputStream.channel
@@ -78,7 +78,7 @@ class DigitClassifier(private val context: Context) {
   }
 
   private fun classify(bitmap: Bitmap): String {
-    Log.i(TAG, "DigitClassifier:classify")
+    Log.i(TAG, "TrajectoryRegressor:classify")
 
     if (!isInitialized) {
       throw IllegalStateException("TF Lite Interpreter is not initialized yet.")
@@ -110,7 +110,7 @@ class DigitClassifier(private val context: Context) {
   }
 
   fun classifyAsync(bitmap: Bitmap): Task<String> {
-    Log.i(TAG, "DigitClassifier:classifyAsync")
+    Log.i(TAG, "TrajectoryRegressor:classifyAsync")
     val task = TaskCompletionSource<String>()
     executorService.execute {
       val result = classify(bitmap)
@@ -120,7 +120,7 @@ class DigitClassifier(private val context: Context) {
   }
 
   fun close() {
-    Log.i(TAG, "DigitClassifier:close")
+    Log.i(TAG, "TrajectoryRegressor:close")
     executorService.execute {
       interpreter?.close()
       Log.d(TAG, "Closed TFLite interpreter.")
@@ -153,7 +153,7 @@ class DigitClassifier(private val context: Context) {
   }
 
   companion object {
-    private const val TAG = "DigitClassifier"
+    private const val TAG = "TrajectoryRegressor"
 
     private const val MODEL_FILE = "mnist.tflite"
 
