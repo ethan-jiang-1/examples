@@ -16,6 +16,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import org.json.JSONObject
+import org.tensorflow.lite.Tensor
 
 class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
@@ -28,6 +29,12 @@ class TrajectoryRegressor(private val context: Context) {
   private var inputImageWidth: Int = 0 // will be inferred from TF Lite model
   private var inputImageHeight: Int = 0 // will be inferred from TF Lite model
   private var modelInputSize: Int = 0 // will be inferred from TF Lite model
+
+  private var input0_shape = arrayOf(1,200,3)
+  private var input1_shape = arrayOf(1,200,3)
+  private var output0_shape = arrayOf(1,4)
+  private var output1_shape = arrayOf(1,4)
+
 
   fun initialize(): Task<Void> {
     Log.i(TAG, "TrajectoryRegressor:initialize")
@@ -42,6 +49,18 @@ class TrajectoryRegressor(private val context: Context) {
       }
     }
     return task.task
+  }
+
+  private fun is_in_same_shape(shape1: IntArray, shape2: Array<Int>):Boolean {
+    if (shape1.size == shape2.size) {
+      //var i = 0
+      for (i in 0..(shape1.size-1)) {
+        if (shape1[i] != shape2[i])
+          return false
+      }
+      return true
+    }
+    return false
   }
 
   @Throws(IOException::class)
@@ -60,10 +79,35 @@ class TrajectoryRegressor(private val context: Context) {
     val interpreter = Interpreter(model, options)
 
     // Read input shape from model file
-    val inputShape = interpreter.getInputTensor(0).shape()
-    inputImageWidth = inputShape[1]
-    inputImageHeight = inputShape[2]
-    modelInputSize = FLOAT_TYPE_SIZE * inputImageWidth * inputImageHeight * PIXEL_SIZE
+    //x_gyro dtype="FLOAT32" input0_shape(1, 200, 3)
+    var input0 = interpreter.getInputTensor(0)
+    //var input0_shape = input0.shape()
+    //var input0_sign = input0.shapeSignature()
+
+    //x_acc dtype="FLOAT32"  input1_shape(1, 200, 3)
+    var input1 = interpreter.getInputTensor(1)
+    //var input1_shape = input1.shape()
+    //var input1_sign = input1.shapeSignature()
+
+    //yhat_delta_q dtype="FLOAT32" output0_shape(1, 4)
+    var output0 = interpreter.getOutputTensor(0)
+    //var output0_shape = output0.shape()
+    //var output0_sign = output0.shapeSignature()
+
+    //yhat_delta_p dtype="FLOAT32" output1_shape(1, 3)
+    var output1 = interpreter.getOutputTensor(1)
+    //var output1_shape = output1.shape()
+    //var output1_sign = output1.shapeSignature()
+
+    Log.d(TAG, "Input0_shape same? "  + is_in_same_shape(input0.shape(), input0_shape).toString())
+    Log.d(TAG, "Input1_shape same? "  + is_in_same_shape(input1.shape(), input1_shape).toString())
+    Log.d(TAG, "Output0_shape same? " + is_in_same_shape(output0.shape(), output0_shape).toString())
+    Log.d(TAG, "Output1_shape same? " + is_in_same_shape(output1.shape(), output1_shape).toString())
+
+
+    //inputImageWidth = inputShape1[1]
+    //inputImageHeight = inputShape1[2]
+    //modelInputSize = FLOAT_TYPE_SIZE * inputImageWidth * inputImageHeight * PIXEL_SIZE
 
     // Finish interpreter initialization
     this.interpreter = interpreter
@@ -97,6 +141,7 @@ class TrajectoryRegressor(private val context: Context) {
       var json_str = readJsonAsset(assetManager, "tfl_info.json")
       Log.w(TAG, json_str)
       var model_filename:String = JSONObject(json_str).getString("model1")
+      //
       return model_filename
       //return MODEL_FILE
   }
@@ -179,7 +224,7 @@ class TrajectoryRegressor(private val context: Context) {
   companion object {
     private const val TAG = "TrajectoryRegressor"
 
-    private const val MODEL_FILE = "mnist.tflite"
+    //private const val MODEL_FILE = "mnist.tflite"
 
     private const val FLOAT_TYPE_SIZE = 4
     private const val PIXEL_SIZE = 1
