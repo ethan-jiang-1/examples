@@ -22,8 +22,8 @@ class MainActivity : AppCompatActivity() {
   // the digitClassifier
   //private var digitClassifier = DigitClassifier(this)
   //private var digitClassifier = null
-  private val digitClassifier by lazy {Log.w(TAG, "Lazy loading digitClassifier")
-                                       DigitClassifier(this)}
+//  private val digitClassifier by lazy {Log.w(TAG, "Lazy loading digitClassifier")
+//                                       DigitClassifier(this)}
 
   private val trajectoryRegressor by lazy {Log.w(TAG, "Lazy loading trajectoryRegressor")
                                           TrajectoryRegressor(this)}
@@ -92,11 +92,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     // Setup digit classifier
-    Log.w(TAG, "initial digtitClassifier in MainActivatiy")
-    //digitClassifier = DigitClassifier(this)
-    digitClassifier
-      .initialize()
-      .addOnFailureListener { e -> Log.e(TAG, "Error to setting up digit classifier.", e) }
+//    Log.w(TAG, "initial digtitClassifier in MainActivatiy")
+//    //digitClassifier = DigitClassifier(this)
+//    digitClassifier
+//      .initialize()
+//      .addOnFailureListener { e -> Log.e(TAG, "Error to setting up digit classifier.", e) }
 
     // Setup digit classifier
     Log.w(TAG, "initial trajectorRegressor in MainActivatiy")
@@ -108,9 +108,9 @@ class MainActivity : AppCompatActivity() {
   }
 
   override fun onDestroy() {
-    if (digitClassifier.isInitialized) {
-      digitClassifier.close()
-    }
+//    if (digitClassifier.isInitialized) {
+//      digitClassifier.close()
+//    }
     if (trajectoryRegressor.isInitialized) {
       trajectoryRegressor.close()
     }
@@ -118,20 +118,20 @@ class MainActivity : AppCompatActivity() {
   }
 
   private fun classifyDrawing() {
-    val bitmap = drawView?.getBitmap()
-
-    if ((bitmap != null) && (digitClassifier.isInitialized)) {
-      digitClassifier
-        .classifyAsync(bitmap)
-        .addOnSuccessListener { resultText -> predictedTextView?.text = resultText }
-        .addOnFailureListener { e ->
-          predictedTextView?.text = getString(
-            R.string.tfe_dc_classification_error_message,
-            e.localizedMessage
-          )
-          Log.e(TAG, "Error classifying drawing.", e)
-        }
-    }
+//    val bitmap = drawView?.getBitmap()
+//
+//    if ((bitmap != null) && (digitClassifier.isInitialized)) {
+//      digitClassifier
+//        .classifyAsync(bitmap)
+//        .addOnSuccessListener { resultText -> predictedTextView?.text = resultText }
+//        .addOnFailureListener { e ->
+//          predictedTextView?.text = getString(
+//            R.string.tfe_dc_classification_error_message,
+//            e.localizedMessage
+//          )
+//          Log.e(TAG, "Error classifying drawing.", e)
+//        }
+//    }
   }
 
   companion object {

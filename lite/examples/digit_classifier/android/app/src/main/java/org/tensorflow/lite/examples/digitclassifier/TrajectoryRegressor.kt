@@ -15,6 +15,8 @@ import java.nio.channels.FileChannel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+import org.json.JSONObject
+
 class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
   var isInitialized = false
@@ -50,8 +52,11 @@ class TrajectoryRegressor(private val context: Context) {
     val model = loadModelFile(assetManager)
 
     // Initialize TF Lite Interpreter with NNAPI enabled
+
     val options = Interpreter.Options()
-    options.setUseNNAPI(true)
+    //Ethan: disable NNAPI for now
+    //options.setUseNNAPI(true)
+
     val interpreter = Interpreter(model, options)
 
     // Read input shape from model file
@@ -68,10 +73,10 @@ class TrajectoryRegressor(private val context: Context) {
 
   @Throws(IOException::class)
   private fun loadModelFile(assetManager: AssetManager): ByteBuffer {
-    Log.i(TAG, "TrajectoryRegressor:loadModelFile")
+    var model_filename = getModelFileName(assetManager)
+    Log.i(TAG, "TrajectoryRegressor:loadModelFile " + model_filename)
 
-    var model_file = getModelFileName(assetManager)
-    val fileDescriptor = assetManager.openFd(model_file)
+    val fileDescriptor = assetManager.openFd(model_filename)
     val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
     val fileChannel = inputStream.channel
     val startOffset = fileDescriptor.startOffset
@@ -91,7 +96,9 @@ class TrajectoryRegressor(private val context: Context) {
   private fun getModelFileName(assetManager: AssetManager): String {
       var json_str = readJsonAsset(assetManager, "tfl_info.json")
       Log.w(TAG, json_str)
-      return MODEL_FILE
+      var model_filename:String = JSONObject(json_str).getString("model1")
+      return model_filename
+      //return MODEL_FILE
   }
 
   private fun classify(bitmap: Bitmap): String {

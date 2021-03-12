@@ -68,7 +68,7 @@ class DigitClassifier(private val context: Context) {
 
   @Throws(IOException::class)
   private fun loadModelFile(assetManager: AssetManager): ByteBuffer {
-    Log.i(TAG, "DigitClassifier:loadModelFile")
+    Log.i(TAG, "DigitClassifier:loadModelFile： " + MODEL_FILE)
     val fileDescriptor = assetManager.openFd(MODEL_FILE)
     val inputStream = FileInputStream(fileDescriptor.fileDescriptor)
     val fileChannel = inputStream.channel
