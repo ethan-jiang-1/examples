@@ -6,7 +6,6 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
-import org.json.JSONArray
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.io.IOException
@@ -17,7 +16,6 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import org.json.JSONObject
-import org.tensorflow.lite.Tensor
 
 class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
@@ -119,7 +117,7 @@ class TrajectoryRegressor(private val context: Context) {
     Log.d(TAG, "Initialized TFLite interpreter.")
 
 
-    var capData:TflCapData = TflCapData(context)
+    var capData:TflaCapData = TflaCapData(context)
     capData.parse("tfl_cap_data_0.json")
     capData.summary()
   }

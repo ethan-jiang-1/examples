@@ -19,7 +19,7 @@ import java.util.concurrent.Executors
 import org.json.JSONObject
 import org.tensorflow.lite.Tensor
 
-class TflCapData(private val context: Context) {
+class TflaCapData(private val context: Context) {
   private var inited: Boolean = false
   private var fileName:String = ""
 
