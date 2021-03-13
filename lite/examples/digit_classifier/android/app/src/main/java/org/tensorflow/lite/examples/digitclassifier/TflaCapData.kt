@@ -25,6 +25,8 @@ class TflaCapData(private val context: Context) {
 
   private var yhat_delta_p = FloatArray(3)
   private var yhat_delta_q = FloatArray(4)
+  private var x_gyro = Array(200){FloatArray(3)}
+  private var x_acc = Array(200){FloatArray(3)}
 
   private fun parse_yhat_delta_p(root:JSONObject) {
     var cap_syhat_delta_p = root.getJSONObject("syhat_delta_p")
@@ -58,6 +60,34 @@ class TflaCapData(private val context: Context) {
     }
   }
 
+  private fun parse_x_gyro(root: JSONObject) {
+    var cap_sx_gyro = root.getJSONObject("sx_gyro")
+
+    var data = cap_sx_gyro.getJSONArray("data")
+    for (i in 0..199) {
+      var datai = data[i]
+      for (j in 0..2) {
+        var dval = (datai as JSONArray).get(j)
+        x_gyro[i][j] = (dval as Double).toFloat()
+      }
+    }
+  }
+
+
+  private fun parse_x_acc(root: JSONObject) {
+    var cap_sx_acc= root.getJSONObject("sx_acc")
+
+    var data = cap_sx_acc.getJSONArray("data")
+    for (i in 0..199) {
+      var datai = data[i]
+      for (j in 0..2) {
+        var dval = (datai as JSONArray).get(j)
+        x_acc[i][j] = (dval as Double).toFloat()
+      }
+    }
+  }
+
+
 
   private fun parse_data() {
     val assetManager = context.assets
@@ -65,9 +95,11 @@ class TflaCapData(private val context: Context) {
     var cap_data_str = readJsonAsset(assetManager, fileName)
 
     var root = JSONObject(cap_data_str)
-    var cap_fiename = root.getString("cap_filename")
-    var cap_order = root.getInt("cap_order")
+    //var cap_fiename = root.getString("cap_filename")
+    //var cap_order = root.getInt("cap_order")
 
+    parse_x_gyro(root)
+    parse_x_acc(root)
     parse_yhat_delta_p(root)
     parse_yhat_delta_q(root)
 
