@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
+import org.json.JSONArray
 import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.io.IOException
@@ -34,6 +35,9 @@ class TrajectoryRegressor(private val context: Context) {
   private var input1_shape = arrayOf(1,200,3)
   private var output0_shape = arrayOf(1,4)
   private var output1_shape = arrayOf(1,4)
+
+  private var tfl_info_json_str: String = "{}"
+  private var tfl_cap_json_str: String = "{}"
 
 
   fun initialize(): Task<Void> {
@@ -113,6 +117,11 @@ class TrajectoryRegressor(private val context: Context) {
     this.interpreter = interpreter
     isInitialized = true
     Log.d(TAG, "Initialized TFLite interpreter.")
+
+
+    var capData:TflCapData = TflCapData(context)
+    capData.parse("tfl_cap_data_0.json")
+    capData.summary()
   }
 
   @Throws(IOException::class)
@@ -137,13 +146,22 @@ class TrajectoryRegressor(private val context: Context) {
     return String(formArray)
   }
 
+  private fun loadAssetJson(assetManager: AssetManager): Boolean {
+    if (tfl_info_json_str.length < 10) {
+      tfl_info_json_str = readJsonAsset(assetManager, "tfl_info.json")
+    }
+    if (tfl_cap_json_str.length < 10) {
+      tfl_cap_json_str = readJsonAsset(assetManager, "tfl_cap_info.json")
+    }
+    return true
+  }
+
   private fun getModelFileName(assetManager: AssetManager): String {
-      var json_str = readJsonAsset(assetManager, "tfl_info.json")
-      Log.w(TAG, json_str)
-      var model_filename:String = JSONObject(json_str).getString("model1")
-      //
-      return model_filename
-      //return MODEL_FILE
+    loadAssetJson(assetManager)
+
+    Log.w(TAG, tfl_info_json_str)
+    var model_filename:String = JSONObject(tfl_info_json_str).getString("model1")
+    return model_filename
   }
 
   private fun classify(bitmap: Bitmap): String {
