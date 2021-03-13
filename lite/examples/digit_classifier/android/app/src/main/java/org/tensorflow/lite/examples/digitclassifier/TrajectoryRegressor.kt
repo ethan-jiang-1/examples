@@ -178,8 +178,8 @@ class TrajectoryRegressor(private val context: Context) {
     var x_acc  = capData.get_x_acc()
     for (i in 0..199) {
         for (j in 0..2) {
-          inputs[0][0][i][j] = x_gyro[i][j]
-          inputs[1][0][i][j] = x_acc[i][j]
+          inputs[1][0][i][j] = x_gyro[i][j]
+          inputs[0][0][i][j] = x_acc[i][j]
         }
     }
 
