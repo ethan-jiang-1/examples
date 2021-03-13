@@ -60,6 +60,7 @@ class MainActivity : AppCompatActivity() {
       Log.w(TAG, "MainActivity:startButton clicked")
       drawView?.clearCanvas()
       predictedTextView?.text = getString(R.string.tfe_dc_start_button_text)
+      estimateTrajectory()
     }
 
     //Setup start button
@@ -132,6 +133,15 @@ class MainActivity : AppCompatActivity() {
 //          Log.e(TAG, "Error classifying drawing.", e)
 //        }
 //    }
+  }
+
+
+  private fun estimateTrajectory() {
+    if (trajectoryRegressor.isInitialized) {
+       trajectoryRegressor
+         .estimateAsyc()
+         .addOnSuccessListener { resultText -> predictedTextView?.text = resultText }
+    }
   }
 
   companion object {

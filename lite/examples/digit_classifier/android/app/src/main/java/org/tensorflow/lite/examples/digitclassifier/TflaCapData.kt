@@ -20,13 +20,13 @@ import org.json.JSONObject
 import org.tensorflow.lite.Tensor
 
 class TflaCapData(private val context: Context) {
-  private var inited: Boolean = false
+  private var parsed: Boolean = false
   private var fileName:String = ""
 
-  private var yhat_delta_p = Array(1){FloatArray(3)}
-  private var yhat_delta_q = Array(1){FloatArray(4)}
-  private var x_gyro = Array(1){Array(200){FloatArray(3)}}
-  private var x_acc = Array(1){Array(200){FloatArray(3)}}
+  private var yhat_delta_p = FloatArray(3)
+  private var yhat_delta_q = FloatArray(4)
+  private var x_gyro = Array(200){FloatArray(3)}
+  private var x_acc = Array(200){FloatArray(3)}
 
   private fun parse_yhat_delta_p(root:JSONObject) {
     var cap_syhat_delta_p = root.getJSONObject("syhat_delta_p")
@@ -40,7 +40,7 @@ class TflaCapData(private val context: Context) {
     //val delta_p = FloatArray(3)
     for (i in 0..2) {
        var dval = (data0 as JSONArray).get(i)
-       yhat_delta_p[0][i] = (dval as Double).toFloat()
+       yhat_delta_p[i] = (dval as Double).toFloat()
     }
   }
 
@@ -56,7 +56,7 @@ class TflaCapData(private val context: Context) {
     //val delta_q = FloatArray(4)
     for (i in 0..3) {
       var dval = (data0 as JSONArray).get(i)
-      yhat_delta_q[0][i] = (dval as Double).toFloat()
+      yhat_delta_q[i] = (dval as Double).toFloat()
     }
   }
 
@@ -68,7 +68,7 @@ class TflaCapData(private val context: Context) {
       var datai = data[i]
       for (j in 0..2) {
         var dval = (datai as JSONArray).get(j)
-        x_gyro[0][i][j] = (dval as Double).toFloat()
+        x_gyro[i][j] = (dval as Double).toFloat()
       }
     }
   }
@@ -82,15 +82,25 @@ class TflaCapData(private val context: Context) {
       var datai = data[i]
       for (j in 0..2) {
         var dval = (datai as JSONArray).get(j)
-        x_acc[0][i][j] = (dval as Double).toFloat()
+        x_acc[i][j] = (dval as Double).toFloat()
       }
     }
   }
 
 
+  fun get_x_gyro(): Array<FloatArray>{
+    return x_gyro
+  }
+
+  fun get_x_acc(): Array<FloatArray> {
+    return x_acc
+  }
 
   private fun parse_data() {
     val assetManager = context.assets
+
+    if (parsed)
+      return
 
     var cap_data_str = readJsonAsset(assetManager, fileName)
 
@@ -103,20 +113,9 @@ class TflaCapData(private val context: Context) {
     parse_yhat_delta_p(root)
     parse_yhat_delta_q(root)
 
-    print(yhat_delta_p)
-    print(yhat_delta_q)
+    parsed = true
   }
 
-  @Throws(IOException::class)
-  fun parse(jsonFileName: String) {
-    Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
-    // Load the TF Lite model
-    val assetManager = context.assets
-
-    fileName = jsonFileName
-
-    parse_data()
-  }
 
   @Throws(IOException::class)
   private fun readJsonAsset(assetManager: AssetManager, fileName: String): String {
@@ -125,6 +124,19 @@ class TflaCapData(private val context: Context) {
     file.read(formArray)
     file.close()
     return String(formArray)
+  }
+
+  fun has_parsed(): Boolean {
+    return parsed
+  }
+
+  @Throws(IOException::class)
+  fun parse(jsonFileName: String) {
+    Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
+
+    fileName = jsonFileName
+
+    parse_data()
   }
 
   companion object {

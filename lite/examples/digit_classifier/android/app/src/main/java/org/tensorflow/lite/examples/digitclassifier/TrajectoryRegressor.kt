@@ -25,16 +25,11 @@ class TrajectoryRegressor(private val context: Context) {
   /** Executor to run inference task in the background */
   private val executorService: ExecutorService = Executors.newCachedThreadPool()
 
-  private var inputImageWidth: Int = 0 // will be inferred from TF Lite model
-  private var inputImageHeight: Int = 0 // will be inferred from TF Lite model
-  private var modelInputSize: Int = 0 // will be inferred from TF Lite model
-
-  private var input0_shape = arrayOf(1,200,3)
-  private var input1_shape = arrayOf(1,200,3)
-  private var output0_shape = arrayOf(1,4)
-  private var output1_shape = arrayOf(1,4)
-
   private var model_filename: String = ""
+
+  private var capData:TflaCapData = TflaCapData(context)
+
+  private var inputs = Array(2){Array(1){Array(200){FloatArray(3)}}}
 
 
   fun initialize(): Task<Void> {
@@ -64,20 +59,12 @@ class TrajectoryRegressor(private val context: Context) {
     return false
   }
 
-  @Throws(IOException::class)
-  private fun initializeInterpreter() {
-    Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
-    // Load the TF Lite model
-    val assetManager = context.assets
-    val model = loadModelFile(assetManager)
+  private fun check_interpreter(interpreter: Interpreter): Boolean {
 
-    // Initialize TF Lite Interpreter with NNAPI enabled
-
-    val options = Interpreter.Options()
-    //Ethan: disable NNAPI for now
-    //options.setUseNNAPI(true)
-
-    val interpreter = Interpreter(model, options)
+    val input0_shape = arrayOf(1,200,3)
+    val input1_shape = arrayOf(1,200,3)
+    val output0_shape = arrayOf(1,4)
+    val output1_shape = arrayOf(1,4)
 
     // Read input shape from model file
     //x_gyro dtype="FLOAT32" input0_shape(1, 200, 3)
@@ -100,30 +87,53 @@ class TrajectoryRegressor(private val context: Context) {
     //var output1_shape = output1.shape()
     //var output1_sign = output1.shapeSignature()
 
-    Log.d(TAG, "Input0_shape same? "  + is_in_same_shape(input0.shape(), input0_shape).toString())
-    Log.d(TAG, "Input1_shape same? "  + is_in_same_shape(input1.shape(), input1_shape).toString())
-    Log.d(TAG, "Output0_shape same? " + is_in_same_shape(output0.shape(), output0_shape).toString())
-    Log.d(TAG, "Output1_shape same? " + is_in_same_shape(output1.shape(), output1_shape).toString())
+    var b1 = is_in_same_shape(input0.shape(), input0_shape)
+    var b2 = is_in_same_shape(input1.shape(), input1_shape)
+    var b3 = is_in_same_shape(output0.shape(), output0_shape)
+    var b4 = is_in_same_shape(output1.shape(), output1_shape)
 
+    Log.d(TAG, "CK:Input0_shape same? "  + b1.toString())
+    Log.d(TAG, "CK:Input1_shape same? "  + b2.toString())
+    Log.d(TAG, "CK:Output0_shape same? " + b3.toString())
+    Log.d(TAG, "CK:Output1_shape same? " + b4.toString())
 
-    //inputImageWidth = inputShape1[1]
-    //inputImageHeight = inputShape1[2]
-    //modelInputSize = FLOAT_TYPE_SIZE * inputImageWidth * inputImageHeight * PIXEL_SIZE
+    return b1 and b2 and b3 and b4
+
+  }
+
+  @Throws(IOException::class)
+  private fun initializeInterpreter() {
+    Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
+    // Load the TF Lite model
+    val assetManager = context.assets
+    val model = loadModelFile(assetManager)
+
+    // Initialize TF Lite Interpreter with NNAPI enabled
+
+    val options = Interpreter.Options()
+    //Ethan: disable NNAPI for now
+    //options.setUseNNAPI(true)
+    //options.setNumThreads(4)
+
+    val interpreter = Interpreter(model, options)
+
+    check_interpreter(interpreter)
 
     // Finish interpreter initialization
     this.interpreter = interpreter
     isInitialized = true
     Log.d(TAG, "Initialized TFLite interpreter.")
 
-
-    var capData:TflaCapData = TflaCapData(context)
+    // Initial captured data from json
+    capData = TflaCapData(context)
     capData.parse("tfla_cap_data_0.json")
     capData.summary()
+    Log.d(TAG, "capData parsed:" + capData.has_parsed().toString())
   }
 
   @Throws(IOException::class)
   private fun loadModelFile(assetManager: AssetManager): ByteBuffer {
-    var model_filename = getModelFileName(assetManager)
+    var model_filename = getModelFileName()
     Log.i(TAG, "TrajectoryRegressor:loadModelFile " + model_filename)
 
     val fileDescriptor = assetManager.openFd(model_filename)
@@ -143,7 +153,7 @@ class TrajectoryRegressor(private val context: Context) {
     return String(formArray)
   }
 
-  private fun getModelFileName(assetManager: AssetManager): String {
+  private fun getModelFileName(): String {
     if (model_filename.length == 0) {
       var tfla_info = TflaInfo(context)
       tfla_info.parse("tfla_info.json")
@@ -152,43 +162,77 @@ class TrajectoryRegressor(private val context: Context) {
     return model_filename
   }
 
-  private fun classify(bitmap: Bitmap): String {
-    Log.i(TAG, "TrajectoryRegressor:classify")
+  private fun estimate(): String {
+    Log.i(TAG, "TrajectoryRegressor:estimate")
 
     if (!isInitialized) {
       throw IllegalStateException("TF Lite Interpreter is not initialized yet.")
     }
 
-    var startTime: Long
-    var elapsedTime: Long
-
-    // Preprocessing: resize the input
-    startTime = System.nanoTime()
-    val resizedImage = Bitmap.createScaledBitmap(bitmap, inputImageWidth, inputImageHeight, true)
-    val byteBuffer = convertBitmapToByteBuffer(resizedImage)
-    elapsedTime = (System.nanoTime() - startTime) / 1000000
-    Log.d(TAG, "Preprocessing time = " + elapsedTime + "ms")
-
-    startTime = System.nanoTime()
-    val result = Array(1) { FloatArray(OUTPUT_CLASSES_COUNT) }
-
-    var loopmax = 100
-    for (i in 1..loopmax) {
-      interpreter?.run(byteBuffer, result)
+    if (!capData.has_parsed()) {
+      throw IllegalAccessError("capData not parsed")
     }
-    elapsedTime = (System.nanoTime() - startTime) / 1000000
 
-    Log.d(TAG, "Inference time = " + elapsedTime + "ms" + " within loop " + loopmax)
-    Log.d(TAG, getOutputString(result[0]))
+    Log.i(TAG, "initial iputs")
+    var x_gyro = capData.get_x_gyro()
+    var x_acc  = capData.get_x_acc()
+    for (i in 0..199) {
+        for (j in 0..2) {
+          inputs[0][0][i][j] = x_gyro[i][j]
+          inputs[1][0][i][j] = x_acc[i][j]
+        }
+    }
 
-    return getOutputString(result[0])
+    var output0 = Array(1){FloatArray(4)}
+    var output1 = Array(1){FloatArray(3)}
+
+    var outputs = HashMap<Int, Array<FloatArray>>()
+    outputs.put(0, output0)
+    outputs.put(1, output1)
+
+
+
+    Log.i(TAG, "start")
+    var startTime = System.nanoTime()
+    for (i in 0..100) {
+      interpreter?.runForMultipleInputsOutputs(inputs, outputs as Map<Int, Any>)
+    }
+    var elapsedTime = (System.nanoTime() - startTime) / 1000000
+
+    var elapsedTimeMs = elapsedTime.toString()
+    Log.i(TAG, "end: " + elapsedTimeMs +  " ms / 100 loop")
+
+//    var startTime: Long
+//    var elapsedTime: Long
+//
+//    // Preprocessing: resize the input
+//    startTime = System.nanoTime()
+//    val resizedImage = Bitmap.createScaledBitmap(bitmap, inputImageWidth, inputImageHeight, true)
+//    val byteBuffer = convertBitmapToByteBuffer(resizedImage)
+//    elapsedTime = (System.nanoTime() - startTime) / 1000000
+//    Log.d(TAG, "Preprocessing time = " + elapsedTime + "ms")
+//
+//    startTime = System.nanoTime()
+//    val result = Array(1) { FloatArray(OUTPUT_CLASSES_COUNT) }
+//
+//    var loopmax = 100
+//    for (i in 1..loopmax) {
+//      interpreter?.run(byteBuffer, result)
+//    }
+//    elapsedTime = (System.nanoTime() - startTime) / 1000000
+//
+//    Log.d(TAG, "Inference time = " + elapsedTime + "ms" + " within loop " + loopmax)
+//    Log.d(TAG, getOutputString(result[0]))
+//
+//    return getOutputString(result[0])
+      return "OK: span100: " + elapsedTimeMs + " ms/100loops"
   }
 
-  fun classifyAsync(bitmap: Bitmap): Task<String> {
-    Log.i(TAG, "TrajectoryRegressor:classifyAsync")
+  fun estimateAsyc(): Task<String> {
+    Log.i(TAG, "TrajectoryRegressor:estimateAsyc")
     val task = TaskCompletionSource<String>()
     executorService.execute {
-      val result = classify(bitmap)
+      val result = estimate()
       task.setResult(result)
     }
     return task.task
@@ -200,31 +244,6 @@ class TrajectoryRegressor(private val context: Context) {
       interpreter?.close()
       Log.d(TAG, "Closed TFLite interpreter.")
     }
-  }
-
-  private fun convertBitmapToByteBuffer(bitmap: Bitmap): ByteBuffer {
-    val byteBuffer = ByteBuffer.allocateDirect(modelInputSize)
-    byteBuffer.order(ByteOrder.nativeOrder())
-
-    val pixels = IntArray(inputImageWidth * inputImageHeight)
-    bitmap.getPixels(pixels, 0, bitmap.width, 0, 0, bitmap.width, bitmap.height)
-
-    for (pixelValue in pixels) {
-      val r = (pixelValue shr 16 and 0xFF)
-      val g = (pixelValue shr 8 and 0xFF)
-      val b = (pixelValue and 0xFF)
-
-      // Convert RGB to grayscale and normalize pixel value to [0..1]
-      val normalizedPixelValue = (r + g + b) / 3.0f / 255.0f
-      byteBuffer.putFloat(normalizedPixelValue)
-    }
-
-    return byteBuffer
-  }
-
-  private fun getOutputString(output: FloatArray): String {
-    val maxIndex = output.indices.maxBy { output[it] } ?: -1
-    return "Prediction Result: %d\nConfidence: %2f".format(maxIndex, output[maxIndex])
   }
 
   companion object {
