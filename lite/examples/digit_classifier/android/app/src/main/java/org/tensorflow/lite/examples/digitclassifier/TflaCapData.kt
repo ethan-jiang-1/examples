@@ -59,7 +59,7 @@ class TflaCapData(private val context: Context) {
   }
 
 
-  private fun parse_cap_data() {
+  private fun parse_data() {
     val assetManager = context.assets
 
     var cap_data_str = readJsonAsset(assetManager, fileName)
@@ -83,7 +83,7 @@ class TflaCapData(private val context: Context) {
 
     fileName = jsonFileName
 
-    parse_cap_data()
+    parse_data()
   }
 
   @Throws(IOException::class)
@@ -96,7 +96,7 @@ class TflaCapData(private val context: Context) {
   }
 
   companion object {
-    private const val TAG = "TflCapData"
+    private const val TAG = "TflaCapData"
 
   }
 

@@ -34,8 +34,7 @@ class TrajectoryRegressor(private val context: Context) {
   private var output0_shape = arrayOf(1,4)
   private var output1_shape = arrayOf(1,4)
 
-  private var tfl_info_json_str: String = "{}"
-  private var tfl_cap_json_str: String = "{}"
+  private var model_filename: String = ""
 
 
   fun initialize(): Task<Void> {
@@ -118,7 +117,7 @@ class TrajectoryRegressor(private val context: Context) {
 
 
     var capData:TflaCapData = TflaCapData(context)
-    capData.parse("tfl_cap_data_0.json")
+    capData.parse("tfla_cap_data_0.json")
     capData.summary()
   }
 
@@ -144,21 +143,12 @@ class TrajectoryRegressor(private val context: Context) {
     return String(formArray)
   }
 
-  private fun loadAssetJson(assetManager: AssetManager): Boolean {
-    if (tfl_info_json_str.length < 10) {
-      tfl_info_json_str = readJsonAsset(assetManager, "tfl_info.json")
-    }
-    if (tfl_cap_json_str.length < 10) {
-      tfl_cap_json_str = readJsonAsset(assetManager, "tfl_cap_info.json")
-    }
-    return true
-  }
-
   private fun getModelFileName(assetManager: AssetManager): String {
-    loadAssetJson(assetManager)
-
-    Log.w(TAG, tfl_info_json_str)
-    var model_filename:String = JSONObject(tfl_info_json_str).getString("model1")
+    if (model_filename.length == 0) {
+      var tfla_info = TflaInfo(context)
+      tfla_info.parse("tfla_info.json")
+      model_filename = tfla_info.get_model_filename1()
+    }
     return model_filename
   }
 
