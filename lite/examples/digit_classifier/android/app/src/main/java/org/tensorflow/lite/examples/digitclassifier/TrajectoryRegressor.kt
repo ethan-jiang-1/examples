@@ -173,6 +173,7 @@ class TrajectoryRegressor(private val context: Context) {
       throw IllegalAccessError("capData not parsed")
     }
 
+    //prepare inputs
     Log.i(TAG, "initial iputs")
     var x_gyro = capData.get_x_gyro()
     var x_acc  = capData.get_x_acc()
@@ -183,15 +184,14 @@ class TrajectoryRegressor(private val context: Context) {
         }
     }
 
+    //prepare outputs
     var output0 = Array(1){FloatArray(4)}
     var output1 = Array(1){FloatArray(3)}
-
     var outputs = HashMap<Int, Array<FloatArray>>()
     outputs.put(0, output0)
     outputs.put(1, output1)
 
-
-
+    //run estimation 100 times
     Log.i(TAG, "start")
     var startTime = System.nanoTime()
     for (i in 0..100) {
@@ -199,33 +199,15 @@ class TrajectoryRegressor(private val context: Context) {
     }
     var elapsedTime = (System.nanoTime() - startTime) / 1000000
 
+
+    //get outputs out of estimation
     var elapsedTimeMs = elapsedTime.toString()
     Log.i(TAG, "end: " + elapsedTimeMs +  " ms / 100 loop")
 
-//    var startTime: Long
-//    var elapsedTime: Long
-//
-//    // Preprocessing: resize the input
-//    startTime = System.nanoTime()
-//    val resizedImage = Bitmap.createScaledBitmap(bitmap, inputImageWidth, inputImageHeight, true)
-//    val byteBuffer = convertBitmapToByteBuffer(resizedImage)
-//    elapsedTime = (System.nanoTime() - startTime) / 1000000
-//    Log.d(TAG, "Preprocessing time = " + elapsedTime + "ms")
-//
-//    startTime = System.nanoTime()
-//    val result = Array(1) { FloatArray(OUTPUT_CLASSES_COUNT) }
-//
-//    var loopmax = 100
-//    for (i in 1..loopmax) {
-//      interpreter?.run(byteBuffer, result)
-//    }
-//    elapsedTime = (System.nanoTime() - startTime) / 1000000
-//
-//    Log.d(TAG, "Inference time = " + elapsedTime + "ms" + " within loop " + loopmax)
-//    Log.d(TAG, getOutputString(result[0]))
-//
-//    return getOutputString(result[0])
-      return "OK: span100: " + elapsedTimeMs + " ms/100loops"
+    var yhat_delta_p = outputs.get(1)?.get(0)
+    var yhat_delta_q = outputs.get(0)?.get(0)
+
+    return "OK: span100: " + elapsedTimeMs + " ms/100loops"
   }
 
   fun estimateAsyc(): Task<String> {
