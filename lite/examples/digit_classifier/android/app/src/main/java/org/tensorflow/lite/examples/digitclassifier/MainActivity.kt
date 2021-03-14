@@ -18,6 +18,7 @@ class MainActivity : AppCompatActivity() {
   private var stopButton: Button? = null
   private var resetButton: Button? = null
   private var predictedTextView: TextView? = null
+  private var modelTextView: TextView? = null
 
   // the digitClassifier
   //private var digitClassifier = DigitClassifier(this)
@@ -47,6 +48,7 @@ class MainActivity : AppCompatActivity() {
     resetButton = findViewById(R.id.reset_button)
 
     predictedTextView = findViewById(R.id.predicted_text)
+    modelTextView = findViewById(R.id.model_text)
 
     // Setup clear drawing button
     clearButton?.setOnClickListener {
@@ -105,7 +107,7 @@ class MainActivity : AppCompatActivity() {
       .initialize()
       .addOnFailureListener { e -> Log.e(TAG, "Error to setting up trajectory regressor.", e) }
 
-
+    modelTextView?.text = trajectoryRegressor.getModelFileName()
   }
 
   override fun onDestroy() {

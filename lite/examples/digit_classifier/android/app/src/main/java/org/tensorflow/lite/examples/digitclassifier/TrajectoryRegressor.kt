@@ -113,7 +113,7 @@ class TrajectoryRegressor(private val context: Context) {
     val options = Interpreter.Options()
     //Ethan: disable NNAPI for now
     //options.setUseNNAPI(true)
-    //options.setNumThreads(4)
+    options.setNumThreads(2)
 
     val interpreter = Interpreter(model, options)
 
@@ -133,7 +133,7 @@ class TrajectoryRegressor(private val context: Context) {
 
   @Throws(IOException::class)
   private fun loadModelFile(assetManager: AssetManager): ByteBuffer {
-    var model_filename = getModelFileName()
+    model_filename = getModelFileName()
     Log.i(TAG, "TrajectoryRegressor:loadModelFile " + model_filename)
 
     val fileDescriptor = assetManager.openFd(model_filename)
@@ -153,7 +153,7 @@ class TrajectoryRegressor(private val context: Context) {
     return String(formArray)
   }
 
-  private fun getModelFileName(): String {
+  fun getModelFileName(): String {
     if (model_filename.length == 0) {
       var tfla_info = TflaInfo(context)
       tfla_info.parse("tfla_info.json")
