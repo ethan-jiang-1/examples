@@ -30,11 +30,14 @@ class PumpMgr(private val context: Context) {
   fun init(mode:String) {
     init_mode = mode
 
-    capData = PumpCapData(context)
-    capData!!.init("tfla_cap_data_0.json")
-
-    pumperInterface = capData
-
+    Log.w(TAG, "mode:  " + mode.toString())
+    if (mode == "capData:0") {
+      capData = PumpCapData(context)
+      capData!!.init("tfla_cap_data_0.json")
+      pumperInterface = capData
+    } else {
+      Log.e(TAG, "mode not supported: " + mode)
+    }
   }
 
   fun newRound(): Int? {

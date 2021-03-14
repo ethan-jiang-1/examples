@@ -103,7 +103,7 @@ class MainActivity : AppCompatActivity() {
 //      .addOnFailureListener { e -> Log.e(TAG, "Error to setting up digit classifier.", e) }
 
     pumper = PumpMgr(this)
-    pumper!!.init("capData")
+    pumper!!.init("capData:0")
 
     // Setup digit classifier
     Log.w(TAG, "initial trajectorRegressor in MainActivatiy")
