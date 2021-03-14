@@ -168,6 +168,9 @@ class TrajectoryRegressor(private val context: Context) {
     //  throw IllegalAccessError("capData not parsed")
     //}
     var round = pumper!!.newRound()
+    if (round == null) {
+      return "FAIL: null"
+    }
     if (round < 0) {
       Log.w(TAG, "no new data, skip")
       return "FAIL: no new data"

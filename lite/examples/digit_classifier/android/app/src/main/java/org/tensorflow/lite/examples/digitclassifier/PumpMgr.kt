@@ -22,43 +22,31 @@ import org.tensorflow.lite.Tensor
 class PumpMgr(private val context: Context) {
   private var init_mode:String = ""
 
-  private var capData:TflaCapData? = null
-  private var round_no:Int = 0
+  private var pumperInterface: PumpDataBase? = null
+
+  private var capData:PumpCapData? = null
+
 
   fun init(mode:String) {
     init_mode = mode
 
-    // Initial captured data from json
-    capData = TflaCapData(context)
-    capData!!.parse("tfla_cap_data_0.json")
-    capData!!.summary()
-    Log.d(TAG, "capData parsed:" + capData!!.has_parsed().toString())
+    capData = PumpCapData(context)
+    capData!!.init("tfla_cap_data_0.json")
+
+    pumperInterface = capData
 
   }
 
-  fun newRound(): Int {
-    round_no += 1
-    Log.d(TAG, "newRpund @"+ round_no.toString())
-    return round_no
+  fun newRound(): Int? {
+    return pumperInterface?.newRound()
   }
 
-  fun feedInputs( inputs: Array<Array<Array<FloatArray>>>, round:Int) {
-    var x_gyro = capData!!.get_x_gyro()
-    var x_acc  = capData!!.get_x_acc()
-    for (i in 0..199) {
-      for (j in 0..2) {
-        inputs[1][0][i][j] = x_gyro[i][j]
-        inputs[0][0][i][j] = x_acc[i][j]
-      }
-    }
-    Log.d(TAG, "feedInputs @"+ round.toString())
+  fun feedInputs( inputs: Array<Array<Array<FloatArray>>>, round:Int): Unit? {
+    return pumperInterface?.feedInputs(inputs, round)
   }
 
-  fun respOutputs(outputs:HashMap<Int, Array<FloatArray>>, round:Int) {
-    var yhat_delta_p = outputs.get(1)?.get(0)
-    var yhat_delta_q = outputs.get(0)?.get(0)
-
-    Log.d(TAG, "respOutpus @"+ round.toString())
+  fun respOutputs(outputs:HashMap<Int, Array<FloatArray>>, round:Int): Unit? {
+    return pumperInterface?.respOutputs(outputs,round)
   }
 
 
