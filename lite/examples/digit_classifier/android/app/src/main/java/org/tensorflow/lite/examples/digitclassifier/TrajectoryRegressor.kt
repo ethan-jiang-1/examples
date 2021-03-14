@@ -27,12 +27,12 @@ class TrajectoryRegressor(private val context: Context) {
 
   private var model_filename: String = ""
 
-  private var capData:TflaCapData = TflaCapData(context)
-
   private var inputs = Array(2){Array(1){Array(200){FloatArray(3)}}}
 
+  private var pumper: PumpMgr? = null
 
-  fun initialize(): Task<Void> {
+  fun initialize(cur_pumper: PumpMgr): Task<Void> {
+    pumper = cur_pumper
     Log.i(TAG, "TrajectoryRegressor:initialize")
     val task = TaskCompletionSource<Void>()
     executorService.execute {
@@ -124,11 +124,6 @@ class TrajectoryRegressor(private val context: Context) {
     isInitialized = true
     Log.d(TAG, "Initialized TFLite interpreter.")
 
-    // Initial captured data from json
-    capData = TflaCapData(context)
-    capData.parse("tfla_cap_data_0.json")
-    capData.summary()
-    Log.d(TAG, "capData parsed:" + capData.has_parsed().toString())
   }
 
   @Throws(IOException::class)
@@ -169,20 +164,19 @@ class TrajectoryRegressor(private val context: Context) {
       throw IllegalStateException("TF Lite Interpreter is not initialized yet.")
     }
 
-    if (!capData.has_parsed()) {
-      throw IllegalAccessError("capData not parsed")
+    //if (!capData.has_parsed()) {
+    //  throw IllegalAccessError("capData not parsed")
+    //}
+    var round = pumper!!.newRound()
+    if (round < 0) {
+      Log.w(TAG, "no new data, skip")
+      return "FAIL: no new data"
     }
 
     //prepare inputs
     Log.i(TAG, "initial iputs")
-    var x_gyro = capData.get_x_gyro()
-    var x_acc  = capData.get_x_acc()
-    for (i in 0..199) {
-        for (j in 0..2) {
-          inputs[1][0][i][j] = x_gyro[i][j]
-          inputs[0][0][i][j] = x_acc[i][j]
-        }
-    }
+    pumper!!.feedInputs(inputs, round)
+
 
     //prepare outputs
     var output0 = Array(1){FloatArray(4)}
@@ -204,8 +198,7 @@ class TrajectoryRegressor(private val context: Context) {
     var elapsedTimeMs = elapsedTime.toString()
     Log.i(TAG, "end: " + elapsedTimeMs +  " ms / 100 loop")
 
-    var yhat_delta_p = outputs.get(1)?.get(0)
-    var yhat_delta_q = outputs.get(0)?.get(0)
+    pumper!!.respOutputs(outputs, round)
 
     return "OK: span100: " + elapsedTimeMs + " ms/100loops"
   }
@@ -222,6 +215,7 @@ class TrajectoryRegressor(private val context: Context) {
 
   fun close() {
     Log.i(TAG, "TrajectoryRegressor:close")
+    pumper = null
     executorService.execute {
       interpreter?.close()
       Log.d(TAG, "Closed TFLite interpreter.")

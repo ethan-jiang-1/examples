@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
   private var resetButton: Button? = null
   private var predictedTextView: TextView? = null
   private var modelTextView: TextView? = null
+  private var pumper: PumpMgr? = null
 
   // the digitClassifier
   //private var digitClassifier = DigitClassifier(this)
@@ -101,10 +102,13 @@ class MainActivity : AppCompatActivity() {
 //      .initialize()
 //      .addOnFailureListener { e -> Log.e(TAG, "Error to setting up digit classifier.", e) }
 
+    pumper = PumpMgr(this)
+    pumper!!.init("capData")
+
     // Setup digit classifier
     Log.w(TAG, "initial trajectorRegressor in MainActivatiy")
     trajectoryRegressor
-      .initialize()
+      .initialize(pumper!!)
       .addOnFailureListener { e -> Log.e(TAG, "Error to setting up trajectory regressor.", e) }
 
     modelTextView?.text = trajectoryRegressor.getModelFileName()
