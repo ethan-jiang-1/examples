@@ -1,6 +1,7 @@
 package org.tensorflow.lite.examples.digitclassifier
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -23,12 +24,16 @@ class MainActivity : AppCompatActivity() {
 
   private var pumper: PumpMgr? = null
 
+  val FINISH = "finish_key_extra"
+
+
   // the digitClassifier
   //private var digitClassifier = DigitClassifier(this)
-  //private var digitClassifier = null
+  // private var digitClassifier = null
 //  private val digitClassifier by lazy {Log.w(TAG, "Lazy loading digitClassifier")
 //                                       DigitClassifier(this)}
 
+  //the trajectory regressor
   private val trajectoryRegressor by lazy {Log.w(TAG, "Lazy loading trajectoryRegressor")
                                           TrajectoryRegressor(this)}
 
@@ -84,8 +89,28 @@ class MainActivity : AppCompatActivity() {
       Log.w(TAG, "MainActivity:resetButton clicked")
       drawView?.clearCanvas()
       predictedTextView?.text = getString(R.string.tfe_dc_exit_button_text)
+
+      val intent = Intent(this, MainActivity::class.java)
+      intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+      intent.putExtra(FINISH, true)
+      finish()
     }
 
+    var finish = getIntent().getBooleanExtra(FINISH, false) //default false if not set by argument
+    if(finish) {
+      finish()
+      return
+    }
+
+
+    //setup classifier
+    //setup_classifer()
+
+    //setup estimator
+    setup_estimator()
+  }
+
+  private fun setup_classifer() {
 
     // Setup classification trigger so that it classify after every stroke drew
     drawView?.setOnTouchListener { _, event ->
@@ -94,27 +119,30 @@ class MainActivity : AppCompatActivity() {
       drawView?.onTouchEvent(event)
 
       // Then if user finished a touch event, run classification
-//      if (event.action == MotionEvent.ACTION_UP) {
-//        classifyDrawing()
-//      }
+      //if (event.action == MotionEvent.ACTION_UP) {
+      //  classifyDrawing()
+      //}
 
       true
     }
 
     // Setup digit classifier
-//    Log.w(TAG, "initial digtitClassifier in MainActivatiy")
-//    //digitClassifier = DigitClassifier(this)
-//    digitClassifier
-//      .initialize()
-//      .addOnFailureListener { e -> Log.e(TAG, "Error to setting up digit classifier.", e) }
+    Log.w(TAG, "initial digtitClassifier in MainActivatiy")
+    //digitClassifier = DigitClassifier(this)
+    //digitClassifier
+    //  .initialize()
+    //  .addOnFailureListener { e -> Log.e(TAG, "Error to setting up digit classifier.", e) }
 
+  }
+
+  private fun setup_estimator() {
     //Init pumper
     pumper = PumpMgr(this)
     val pump_mode = "capData:tfla_cap_data_0.json"
     var init_ret = pumper!!.init(pump_mode)
 
     // Setup trajector Regressor
-    Log.w(TAG, "initial trajectorRegressor in MainActivatiy")
+    Log.w(TAG, "initial trajectorRegressor in MainActivatiy: " + init_ret)
     trajectoryRegressor
       .initialize(pumper!!)
       .addOnFailureListener { e -> Log.e(TAG, "Error to setting up trajectory regressor.", e) }
