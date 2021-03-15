@@ -157,7 +157,7 @@ class TrajectoryRegressor(private val context: Context) {
     return model_filename
   }
 
-  private fun estimate(): String {
+  private fun estimate(est_mode:String): String {
     Log.i(TAG, "TrajectoryRegressor:estimate")
 
     if (!isInitialized) {
@@ -191,7 +191,16 @@ class TrajectoryRegressor(private val context: Context) {
     //run estimation 100 times
     Log.i(TAG, "start")
     var startTime = System.nanoTime()
-    for (i in 0..100) {
+
+    var loopEstimation = pumper!!.loopEstimate()!!
+    if (loopEstimation) {
+      Log.d(TAG, "loop 100 times to check performance")
+      for (i in 0..100) {
+        interpreter?.runForMultipleInputsOutputs(inputs, outputs as Map<Int, Any>)
+      }
+
+    } else {
+      Log.d(TAG, "make estimation by regressor")
       interpreter?.runForMultipleInputsOutputs(inputs, outputs as Map<Int, Any>)
     }
     var elapsedTime = (System.nanoTime() - startTime) / 1000000
@@ -206,11 +215,11 @@ class TrajectoryRegressor(private val context: Context) {
     return "OK: span100: " + elapsedTimeMs + " ms/100loops"
   }
 
-  fun estimateAsyc(): Task<String> {
+  fun estimateAsyc(est_mode:String): Task<String> {
     Log.i(TAG, "TrajectoryRegressor:estimateAsyc")
     val task = TaskCompletionSource<String>()
     executorService.execute {
-      val result = estimate()
+      val result = estimate(est_mode)
       task.setResult(result)
     }
     return task.task

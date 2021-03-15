@@ -60,6 +60,9 @@ class PumpCapData(private val context: Context): PumpDataBase() {
     Log.d(TAG, "respOutpus @"+ round.toString())
   }
 
+  override fun loopEstimate(): Boolean {
+    return true
+  }
 
   companion object {
     private const val TAG = "PumpDataCapData"

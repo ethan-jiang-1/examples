@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import android.util.Log
-import android.view.MotionEvent
 import android.widget.Button
 import android.widget.TextView
 import com.divyanshu.draw.widget.DrawView
@@ -14,11 +13,14 @@ class MainActivity : AppCompatActivity() {
 
   private var drawView: DrawView? = null
   private var clearButton: Button? = null
-  private var startButton: Button? = null
-  private var stopButton: Button? = null
-  private var resetButton: Button? = null
+  private var startOneButton: Button? = null
+  private var startMultiButton: Button? = null
+  private var exitButton: Button? = null
+
   private var predictedTextView: TextView? = null
   private var modelTextView: TextView? = null
+  private var pumpTextView: TextView? = null
+
   private var pumper: PumpMgr? = null
 
   // the digitClassifier
@@ -44,12 +46,13 @@ class MainActivity : AppCompatActivity() {
     drawView?.setBackgroundColor(Color.BLACK)
 
     clearButton = findViewById(R.id.clear_button)
-    startButton = findViewById(R.id.start_button)
-    stopButton = findViewById(R.id.stop_button)
-    resetButton = findViewById(R.id.reset_button)
+    startOneButton = findViewById(R.id.start_one_button)
+    startMultiButton = findViewById(R.id.start_multi_button)
+    exitButton = findViewById(R.id.exit_button)
 
     predictedTextView = findViewById(R.id.predicted_text)
     modelTextView = findViewById(R.id.model_text)
+    pumpTextView = findViewById(R.id.pump_text)
 
     // Setup clear drawing button
     clearButton?.setOnClickListener {
@@ -58,26 +61,29 @@ class MainActivity : AppCompatActivity() {
       predictedTextView?.text = getString(R.string.tfe_dc_prediction_text_placeholder)
     }
 
-    //Setup start button
-    startButton?.setOnClickListener{
+    //Setup start one button
+    startOneButton?.setOnClickListener{
       Log.w(TAG, "MainActivity:startButton clicked")
       drawView?.clearCanvas()
-      predictedTextView?.text = getString(R.string.tfe_dc_start_button_text)
-      estimateTrajectory()
+      predictedTextView?.text = getString(R.string.tfe_dc_start_one_button_text)
+      
+      estimateTrajectory("one")
     }
 
-    //Setup start button
-    stopButton?.setOnClickListener{
+    //Setup start multi button
+    startMultiButton?.setOnClickListener{
       Log.w(TAG, "MainActivity:stopButton clicked")
       drawView?.clearCanvas()
-      predictedTextView?.text = getString(R.string.tfe_dc_stop_button_text)
+      predictedTextView?.text = getString(R.string.tfe_dc_start_multi_button_text)
+
+      estimateTrajectory("multi")
     }
 
-    //Setup start button
-    resetButton?.setOnClickListener{
+    //Setup exit button
+    exitButton?.setOnClickListener{
       Log.w(TAG, "MainActivity:resetButton clicked")
       drawView?.clearCanvas()
-      predictedTextView?.text = getString(R.string.tfe_dc_reset_button_text)
+      predictedTextView?.text = getString(R.string.tfe_dc_exit_button_text)
     }
 
 
@@ -102,16 +108,19 @@ class MainActivity : AppCompatActivity() {
 //      .initialize()
 //      .addOnFailureListener { e -> Log.e(TAG, "Error to setting up digit classifier.", e) }
 
+    //Init pumper
     pumper = PumpMgr(this)
-    pumper!!.init("capData:0")
+    val pump_mode = "capData:tfla_cap_data_0.json"
+    var init_ret = pumper!!.init(pump_mode)
 
-    // Setup digit classifier
+    // Setup trajector Regressor
     Log.w(TAG, "initial trajectorRegressor in MainActivatiy")
     trajectoryRegressor
       .initialize(pumper!!)
       .addOnFailureListener { e -> Log.e(TAG, "Error to setting up trajectory regressor.", e) }
 
     modelTextView?.text = trajectoryRegressor.getModelFileName()
+    pumpTextView?.text = pump_mode
   }
 
   override fun onDestroy() {
@@ -142,10 +151,10 @@ class MainActivity : AppCompatActivity() {
   }
 
 
-  private fun estimateTrajectory() {
+  private fun estimateTrajectory(est_mode:String) {
     if (trajectoryRegressor.isInitialized) {
        trajectoryRegressor
-         .estimateAsyc()
+         .estimateAsyc(est_mode)
          .addOnSuccessListener { resultText -> predictedTextView?.text = resultText }
     }
   }

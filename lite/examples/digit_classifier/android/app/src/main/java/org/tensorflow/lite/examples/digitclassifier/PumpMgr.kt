@@ -27,17 +27,38 @@ class PumpMgr(private val context: Context) {
   private var capData:PumpCapData? = null
 
 
-  fun init(mode:String) {
+  fun init(mode:String): String {
     init_mode = mode
 
     Log.w(TAG, "mode:  " + mode.toString())
-    if (mode == "capData:0") {
-      capData = PumpCapData(context)
-      capData!!.init("tfla_cap_data_0.json")
-      pumperInterface = capData
+    if (mode.contains("capData:")) {
+        return init_capData(mode)
+    } else if (mode.contains("dsData:")) {
+        return init_dsData(mode)
     } else {
       Log.e(TAG, "mode not supported: " + mode)
     }
+    return ""
+  }
+
+  private fun init_capData(mode:String): String {
+    val parts = mode.split(":")
+    var filename = parts.get(1)
+    Log.i(TAG, "init_capData: " + filename)
+
+    capData = PumpCapData(context)
+    capData!!.init(filename)
+
+    pumperInterface = capData
+    return filename
+  }
+
+  private fun init_dsData(mode:String):String {
+    val parts = mode.split(":")
+    var filename = parts.get(1)
+    Log.i(TAG, "init_dsData: " + filename)
+
+    return filename
   }
 
   fun newRound(): Int? {
@@ -52,6 +73,9 @@ class PumpMgr(private val context: Context) {
     return pumperInterface?.respOutputs(outputs,round)
   }
 
+  fun loopEstimate(): Boolean? {
+    return pumperInterface?.loopEstimate()
+  }
 
   companion object {
     private const val TAG = "PumpMgr"

@@ -8,47 +8,56 @@
     tools:context=".MainActivity">
 
   <Button
-      android:id="@+id/start_button"
+      android:id="@+id/start_one_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="288dp"
-      android:text="@string/tfe_dc_start_button_text"
+      android:layout_marginBottom="400dp"
+      android:text="@string/tfe_dc_start_one_button_text"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintHorizontal_bias="0.136"
+      app:layout_constraintHorizontal_bias="0.072"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
-      tools:text="start" />
+      app:layout_constraintTop_toBottomOf="@+id/draw_view"
+      app:layout_constraintVertical_bias="1.0"
+      tools:text="StartOne" />
 
   <Button
-      android:id="@+id/stop_button"
+      android:id="@+id/start_multi_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="288dp"
-      android:text="@string/tfe_dc_stop_button_text"
+      android:layout_marginBottom="400dp"
+      android:text="@string/tfe_dc_start_multi_button_text"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintHorizontal_bias="0.501"
+      app:layout_constraintHorizontal_bias="0.953"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
-      tools:text="stop" />
+      app:layout_constraintTop_toBottomOf="@+id/draw_view"
+      app:layout_constraintVertical_bias="1.0"
+      tools:text="StartMulti" />
 
   <Button
-      android:id="@+id/reset_button"
+      android:id="@+id/exit_button"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="288dp"
-      android:text="@string/tfe_dc_reset_button_text"
+      android:layout_marginEnd="64dp"
+      android:layout_marginBottom="4dp"
+      android:text="@string/tfe_dc_exit_button_text"
       app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintHorizontal_bias="0.873"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintHorizontal_bias="0.763"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
-      tools:text="reset" />
+      app:layout_constraintTop_toBottomOf="@+id/draw_view"
+      app:layout_constraintVertical_bias="1.0"
+      tools:text="Exit" />
 
   <com.divyanshu.draw.widget.DrawView
       android:id="@+id/draw_view"
-      android:layout_width="407dp"
-      android:layout_height="296dp"
+      android:layout_width="445dp"
+      android:layout_height="230dp"
       app:layout_constraintDimensionRatio="1:1"
-      app:layout_constraintTop_toTopOf="parent" />
+      app:layout_constraintTop_toTopOf="parent"
+      tools:layout_editor_absoluteX="3dp" />
 
   <TextView
       android:id="@+id/predicted_text"
@@ -58,25 +67,39 @@
       android:textSize="20sp"
       android:textStyle="bold"
       app:layout_constraintBottom_toTopOf="@id/clear_button"
-      app:layout_constraintHorizontal_bias="0.462"
+      app:layout_constraintHorizontal_bias="0.477"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@id/draw_view"
-      app:layout_constraintVertical_bias="0.625" />
+      app:layout_constraintVertical_bias="0.674" />
+
+  <TextView
+      android:id="@+id/pump_text"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="@string/tfe_dc_pump_text_placeholder"
+      android:textSize="14sp"
+      android:textStyle="bold"
+      app:layout_constraintBottom_toTopOf="@id/clear_button"
+      app:layout_constraintHorizontal_bias="0.463"
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/draw_view"
+      app:layout_constraintVertical_bias="0.822" />
 
   <TextView
       android:id="@+id/model_text"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:text="@string/tfe_dc_model_text_placeholder"
-      android:textSize="20sp"
+      android:textSize="14sp"
       android:textStyle="bold"
       app:layout_constraintBottom_toTopOf="@id/clear_button"
-      app:layout_constraintHorizontal_bias="0.462"
+      app:layout_constraintHorizontal_bias="0.466"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toBottomOf="@id/draw_view"
-      app:layout_constraintVertical_bias="0.483" />
+      app:layout_constraintVertical_bias="0.532" />
 
   <Button
       android:id="@+id/clear_button"
@@ -84,7 +107,8 @@
       android:layout_height="wrap_content"
       android:text="@string/tfe_dc_clear_button_text"
       app:layout_constraintBottom_toBottomOf="parent"
+      app:layout_constraintHorizontal_bias="0.28"
       app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"/>
+      app:layout_constraintRight_toRightOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
