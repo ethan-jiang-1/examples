@@ -147,7 +147,7 @@ class MainActivity : AppCompatActivity() {
       .initialize(pumper!!)
       .addOnFailureListener { e -> Log.e(TAG, "Error to setting up trajectory regressor.", e) }
 
-    modelTextView?.text = trajectoryRegressor.getModelFileName()
+    modelTextView?.text = trajectoryRegressor.getModelFileName() + trajectoryRegressor.getModelMode()
     pumpTextView?.text = pump_mode
   }
 

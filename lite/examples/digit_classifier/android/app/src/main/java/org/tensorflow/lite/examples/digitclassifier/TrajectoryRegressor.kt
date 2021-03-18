@@ -31,6 +31,8 @@ class TrajectoryRegressor(private val context: Context) {
 
   private var pumper: PumpMgr? = null
 
+  private var model_mode = "/NNAPI/T2"
+
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
     Log.i(TAG, "TrajectoryRegressor:initialize")
@@ -111,9 +113,20 @@ class TrajectoryRegressor(private val context: Context) {
     // Initialize TF Lite Interpreter with NNAPI enabled
 
     val options = Interpreter.Options()
+
     //Ethan: disable NNAPI for now
-    //options.setUseNNAPI(true)
-    options.setNumThreads(2)
+    if (model_mode.contains("/NNAPI")) {
+      Log.d(TAG, "Interpreter Options: use NNAPI ")
+      options.setUseNNAPI(true)
+    }
+
+    if (model_mode.contains("/T2")) {
+      Log.d(TAG, "Interpreter Options: Thread 2")
+      options.setNumThreads(2)
+    } else if (model_mode.contains("/T4")) {
+      Log.d(TAG, "Interpreter Options: Thread 2")
+      options.setNumThreads(4)
+    }
 
     val interpreter = Interpreter(model, options)
 
@@ -155,6 +168,10 @@ class TrajectoryRegressor(private val context: Context) {
       model_filename = tfla_info.get_model_filename1()
     }
     return model_filename
+  }
+
+  fun getModelMode(): String {
+    return model_mode
   }
 
   private fun estimate(est_mode:String): String {

@@ -1,6 +1,6 @@
 {
-    "model1": "Mw_heavyOlNmx6q_eval_1.tflite",
-    "modelN": "Mw_heavyOlNmx6q_eval_N.tflite",
+    "model1": "Mw_heavyN1Md6q_eval_1.tflite",
+    "modelN": "Mw_heavyN1Md6q_eval_N.tflite",
     "dataset_name": "nclt",
     "sample_step": 20,
     "imu_files": [
