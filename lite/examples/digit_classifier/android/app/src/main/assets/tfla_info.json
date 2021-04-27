@@ -1,5 +1,5 @@
 {
-    "model1": "Mw_heavyB9Mb6q_eval_1.tflite",
+    "modelE": "Mw_heavyB9Mb6q_eval_E.tflite",
     "modelN": "Mw_heavyB9Mb6q_eval_N.tflite",
     "dataset_name": "nclt",
     "sample_step": 20,

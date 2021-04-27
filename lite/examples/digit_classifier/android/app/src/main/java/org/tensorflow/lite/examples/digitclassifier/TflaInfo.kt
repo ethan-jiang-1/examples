@@ -22,7 +22,7 @@ import org.tensorflow.lite.Tensor
 class TflaInfo(private val context: Context) {
   private var fileName:String = ""
 
-  private var model_filename1: String = ""
+  private var model_filenameE: String = ""
   private var model_filenameN: String = ""
 
 
@@ -33,7 +33,7 @@ class TflaInfo(private val context: Context) {
 
     var root = JSONObject(cap_data_str)
 
-    model_filename1 = root.getString("model1")
+    model_filenameE = root.getString("modelE")
     model_filenameN = root.getString("modelN")
   }
 
@@ -48,8 +48,8 @@ class TflaInfo(private val context: Context) {
     parse_data()
   }
 
-  fun get_model_filename1(): String{
-    return model_filename1
+  fun get_model_filenameE(): String{
+    return model_filenameE
   }
 
   fun get_model_filenameN(): String{

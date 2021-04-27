@@ -165,7 +165,12 @@ class TrajectoryRegressor(private val context: Context) {
     if (model_filename.length == 0) {
       var tfla_info = TflaInfo(context)
       tfla_info.parse("tfla_info.json")
-      model_filename = tfla_info.get_model_filename1()
+
+      //if we likte to try experimental model
+      model_filename = tfla_info.get_model_filenameE()
+
+      //if we like to try normal model
+      //model_filename = tfla_info.get_model_filenameN()
     }
     return model_filename
   }
