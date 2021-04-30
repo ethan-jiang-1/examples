@@ -31,7 +31,6 @@ class TrajectoryRegressor(private val context: Context) {
 
   private var pumper: PumpMgr? = null
 
-  private var model_mode = "/NNAPI/T2"
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -103,6 +102,7 @@ class TrajectoryRegressor(private val context: Context) {
 
   }
 
+
   @Throws(IOException::class)
   private fun initializeInterpreter() {
     Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
@@ -114,17 +114,19 @@ class TrajectoryRegressor(private val context: Context) {
 
     val options = Interpreter.Options()
 
+    val iocs = getInterpreterOptionsControllStr()
+
     //Ethan: disable NNAPI for now
-    if (model_mode.contains("/NNAPI")) {
+    if (iocs.contains("/NNAPI")) {
       Log.d(TAG, "Interpreter Options: use NNAPI ")
       options.setUseNNAPI(true)
     }
 
-    if (model_mode.contains("/T2")) {
+    if (iocs.contains("/T2")) {
       Log.d(TAG, "Interpreter Options: Thread 2")
       options.setNumThreads(2)
-    } else if (model_mode.contains("/T4")) {
-      Log.d(TAG, "Interpreter Options: Thread 2")
+    } else if (iocs.contains("/T4")) {
+      Log.d(TAG, "Interpreter Options: Thread 4")
       options.setNumThreads(4)
     }
 
@@ -161,23 +163,40 @@ class TrajectoryRegressor(private val context: Context) {
     return String(formArray)
   }
 
+
+  //ethan: alter the model_file_name
   fun getModelFileName(): String {
     if (model_filename.length == 0) {
       var tfla_info = TflaInfo(context)
       tfla_info.parse("tfla_info.json")
 
       //if we likte to try experimental model
-      model_filename = tfla_info.get_model_filenameE()
+      //model_filename = tfla_info.get_model_filenameP()
+
+      //if we likte to try experimental model
+      model_filename = tfla_info.get_model_filenameO()
 
       //if we like to try normal model
-      //model_filename = tfla_info.get_model_filenameN()
+      //model_filename = tfla_info.get_model_filenameE()
     }
     return model_filename
   }
 
-  fun getModelMode(): String {
-    return model_mode
+  public fun getInterpreterOptionsControllStr(): String {
+    model_filename = getModelFileName()
+    var iocs = ""
+    if (model_filename.contains("_P.tflite")) {
+      iocs = "/T4"
+
+    } else if (model_filename.contains("_O.tflite")) {
+      iocs = "/T4"
+
+    } else if (model_filename.contains("_E.tflite")) {
+      iocs =  "/NNAPI/T4"
+    }
+    return iocs
   }
+
 
   private fun estimate(est_mode:String): String {
     Log.i(TAG, "TrajectoryRegressor:estimate")
