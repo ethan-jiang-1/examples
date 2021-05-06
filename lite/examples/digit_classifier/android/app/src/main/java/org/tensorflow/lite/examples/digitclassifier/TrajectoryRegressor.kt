@@ -172,7 +172,7 @@ class TrajectoryRegressor(private val context: Context) {
     var tfla_info = TflaInfo(context)
     tfla_info.parse("tfla_info.json")
 
-    var select_mode = "E"
+    var select_mode = "E"  //"P", "E", "I"
 
     //if we like to try normal model
     model_filename = tfla_info.get_model_filename(select_mode)
