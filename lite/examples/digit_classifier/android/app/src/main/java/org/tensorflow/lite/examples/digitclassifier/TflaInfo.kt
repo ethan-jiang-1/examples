@@ -18,13 +18,12 @@ import java.util.concurrent.Executors
 
 import org.json.JSONObject
 import org.tensorflow.lite.Tensor
+import java.nio.channels.NonReadableChannelException
 
 class TflaInfo(private val context: Context) {
   private var fileName:String = ""
 
-  private var model_filenameP: String = ""
-  private var model_filenameO: String = ""
-  private var model_filenameE: String = ""
+  private var root = JSONObject("{}")
 
 
   private fun parse_data() {
@@ -32,11 +31,7 @@ class TflaInfo(private val context: Context) {
 
     var cap_data_str = readJsonAsset(assetManager, fileName)
 
-    var root = JSONObject(cap_data_str)
-
-    model_filenameP = root.getString("modelP")
-    model_filenameO = root.getString("modelO")
-    model_filenameE = root.getString("modelE")
+    root = JSONObject(cap_data_str)
   }
 
   @Throws(IOException::class)
@@ -51,16 +46,16 @@ class TflaInfo(private val context: Context) {
   }
 
 
-  fun get_model_filenameP(): String{
-    return model_filenameP
+  fun get_model_filename(name:String): String{
+    var node_name = "model" + name
+    return root.getString(node_name)
+  }
+  fun get_model_filename_sgn(name:String): String{
+    var node_name = "model" + name + "_sgn"
+    return root.getString(node_name)
   }
 
-  fun get_model_filenameO(): String{
-    return model_filenameO
-  }
-  fun get_model_filenameE(): String{
-    return model_filenameE
-  }
+
 
 
   @Throws(IOException::class)

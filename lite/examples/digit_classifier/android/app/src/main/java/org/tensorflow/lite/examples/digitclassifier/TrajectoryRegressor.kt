@@ -26,11 +26,12 @@ class TrajectoryRegressor(private val context: Context) {
   private val executorService: ExecutorService = Executors.newCachedThreadPool()
 
   private var model_filename: String = ""
+  private var model_sgn_filename: String = ""
 
   private var inputs = Array(2){Array(1){Array(200){FloatArray(3)}}}
 
   private var pumper: PumpMgr? = null
-
+  private var mmsj: MwModelSgnJson? = null
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -64,8 +65,8 @@ class TrajectoryRegressor(private val context: Context) {
 
     val input0_shape = arrayOf(1,200,3)
     val input1_shape = arrayOf(1,200,3)
-    val output0_shape = arrayOf(1,4)
-    val output1_shape = arrayOf(1,4)
+    val output_p_shape = arrayOf(1,3)
+    val output_q_shape = arrayOf(1,4)
 
     // Read input shape from model file
     //x_gyro dtype="FLOAT32" input0_shape(1, 200, 3)
@@ -78,20 +79,24 @@ class TrajectoryRegressor(private val context: Context) {
     //var input1_shape = input1.shape()
     //var input1_sign = input1.shapeSignature()
 
+    var ndx_y_delta_p = mmsj!!.get_output_y_delta_p()
+    var ndx_y_delta_q = mmsj!!.get_output_y_delta_q()
+
+
     //yhat_delta_q dtype="FLOAT32" output0_shape(1, 4)
-    var output0 = interpreter.getOutputTensor(0)
+    var output_p = interpreter.getOutputTensor(ndx_y_delta_p)
     //var output0_shape = output0.shape()
     //var output0_sign = output0.shapeSignature()
 
     //yhat_delta_p dtype="FLOAT32" output1_shape(1, 3)
-    var output1 = interpreter.getOutputTensor(1)
+    var output_q = interpreter.getOutputTensor(ndx_y_delta_q)
     //var output1_shape = output1.shape()
     //var output1_sign = output1.shapeSignature()
 
     var b1 = is_in_same_shape(input0.shape(), input0_shape)
     var b2 = is_in_same_shape(input1.shape(), input1_shape)
-    var b3 = is_in_same_shape(output0.shape(), output0_shape)
-    var b4 = is_in_same_shape(output1.shape(), output1_shape)
+    var b3 = is_in_same_shape(output_p.shape(), output_p_shape)
+    var b4 = is_in_same_shape(output_q.shape(), output_q_shape)
 
     Log.d(TAG, "CK:Input0_shape same? "  + b1.toString())
     Log.d(TAG, "CK:Input1_shape same? "  + b2.toString())
@@ -163,23 +168,34 @@ class TrajectoryRegressor(private val context: Context) {
     return String(formArray)
   }
 
+  private fun readFileNames() {
+    var tfla_info = TflaInfo(context)
+    tfla_info.parse("tfla_info.json")
+
+    var select_mode = "E"
+
+    //if we like to try normal model
+    model_filename = tfla_info.get_model_filename(select_mode)
+    model_sgn_filename = tfla_info.get_model_filename_sgn(select_mode)
+
+    mmsj = MwModelSgnJson(context)
+    mmsj!!.parse(model_sgn_filename)
+
+  }
 
   //ethan: alter the model_file_name
   fun getModelFileName(): String {
     if (model_filename.length == 0) {
-      var tfla_info = TflaInfo(context)
-      tfla_info.parse("tfla_info.json")
-
-      //if we likte to try experimental model
-      //model_filename = tfla_info.get_model_filenameP()
-
-      //if we likte to try experimental model
-      model_filename = tfla_info.get_model_filenameO()
-
-      //if we like to try normal model
-      //model_filename = tfla_info.get_model_filenameE()
+      readFileNames()
     }
     return model_filename
+  }
+
+  fun getModelSgnFileName(): String {
+    if (model_sgn_filename.length == 0) {
+      readFileNames()
+    }
+    return model_sgn_filename
   }
 
   public fun getInterpreterOptionsControllStr(): String {
@@ -219,15 +235,17 @@ class TrajectoryRegressor(private val context: Context) {
 
     //prepare inputs
     Log.i(TAG, "initial iputs")
-    pumper!!.feedInputs(inputs, round)
+    pumper!!.feedInputs(inputs, round, mmsj!!)
 
+    var ndx_y_delta_p = mmsj!!.get_output_y_delta_p()
+    var ndx_y_delta_q = mmsj!!.get_output_y_delta_q()
 
     //prepare outputs
     var output0 = Array(1){FloatArray(4)}
     var output1 = Array(1){FloatArray(3)}
     var outputs = HashMap<Int, Array<FloatArray>>()
-    outputs.put(0, output0)
-    outputs.put(1, output1)
+    outputs.put(ndx_y_delta_q, output0)
+    outputs.put(ndx_y_delta_p, output1)
 
     //run estimation 100 times
     Log.i(TAG, "start")
@@ -251,7 +269,7 @@ class TrajectoryRegressor(private val context: Context) {
     var elapsedTimeMs = elapsedTime.toString()
     Log.i(TAG, "end: " + elapsedTimeMs +  " ms / 100 loop")
 
-    pumper!!.respOutputs(outputs, round)
+    pumper!!.respOutputs(outputs, round, mmsj!!)
 
     return "OK: span100: " + elapsedTimeMs + " ms/100loops"
   }

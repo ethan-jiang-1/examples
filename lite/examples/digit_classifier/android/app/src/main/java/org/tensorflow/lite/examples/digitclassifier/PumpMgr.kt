@@ -65,12 +65,12 @@ class PumpMgr(private val context: Context) {
     return pumperInterface?.newRound()
   }
 
-  fun feedInputs( inputs: Array<Array<Array<FloatArray>>>, round:Int): Unit? {
-    return pumperInterface?.feedInputs(inputs, round)
+  fun feedInputs( inputs: Array<Array<Array<FloatArray>>>, round:Int, mmsj:MwModelSgnJson): Unit? {
+    return pumperInterface?.feedInputs(inputs, round, mmsj)
   }
 
-  fun respOutputs(outputs:HashMap<Int, Array<FloatArray>>, round:Int): Unit? {
-    return pumperInterface?.respOutputs(outputs,round)
+  fun respOutputs(outputs:HashMap<Int, Array<FloatArray>>, round:Int, mmsj:MwModelSgnJson): Unit? {
+    return pumperInterface?.respOutputs(outputs,round, mmsj)
   }
 
   fun loopEstimate(): Boolean? {

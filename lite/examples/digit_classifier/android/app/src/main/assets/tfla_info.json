@@ -1,7 +1,8 @@
 {
-    "modelP": "Mw_heavyB9Ma6q_eval_P.tflite",
-    "modelO": "Mw_heavyB9Ma6q_eval_O.tflite",
-    "modelE": "Mw_heavyB9Ma6q_eval_E.tflite",
+    "modelP": "Mw_heavyC1Md6q_eval_P.tflite",
+    "modelP_sgn": "Mw_heavyC1Md6q_eval_P_sgn.json",
+    "modelE": "Mw_heavyC1Md6q_eval_E.tflite",
+    "modelE_sgn": "Mw_heavyC1Md6q_eval_E_sgn.json",
     "dataset_name": "nclt",
     "sample_step": 20,
     "imu_files": [
