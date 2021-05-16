@@ -21,6 +21,7 @@ class MainActivity : AppCompatActivity() {
   private var predictedTextView: TextView? = null
   private var modelTextView: TextView? = null
   private var pumpTextView: TextView? = null
+  private var modelDescriptionView: TextView? = null
 
   private var pumper: PumpMgr? = null
 
@@ -30,8 +31,8 @@ class MainActivity : AppCompatActivity() {
   // the digitClassifier
   //private var digitClassifier = DigitClassifier(this)
   // private var digitClassifier = null
-//  private val digitClassifier by lazy {Log.w(TAG, "Lazy loading digitClassifier")
-//                                       DigitClassifier(this)}
+  //  private val digitClassifier by lazy {Log.w(TAG, "Lazy loading digitClassifier")
+  //                                       DigitClassifier(this)}
 
   //the trajectory regressor
   private val trajectoryRegressor by lazy {Log.w(TAG, "Lazy loading trajectoryRegressor")
@@ -58,6 +59,7 @@ class MainActivity : AppCompatActivity() {
     predictedTextView = findViewById(R.id.predicted_text)
     modelTextView = findViewById(R.id.model_text)
     pumpTextView = findViewById(R.id.pump_text)
+    modelDescriptionView = findViewById(R.id.model_description)
 
     // Setup clear drawing button
     clearButton?.setOnClickListener {
@@ -149,6 +151,7 @@ class MainActivity : AppCompatActivity() {
 
     modelTextView?.text = trajectoryRegressor.getModelFileName() + trajectoryRegressor.getInterpreterOptionsControllStr()
     pumpTextView?.text = pump_mode
+    modelDescriptionView?.text = trajectoryRegressor.getModelDescription()
   }
 
   override fun onDestroy() {

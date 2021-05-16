@@ -27,11 +27,14 @@ class TrajectoryRegressor(private val context: Context) {
 
   private var model_filename: String = ""
   private var model_sgn_filename: String = ""
+  private var model_description:String = ""
 
   private var inputs = Array(2){Array(1){Array(200){FloatArray(3)}}}
 
   private var pumper: PumpMgr? = null
   private var mmsj: MwModelSgnJson? = null
+
+  private var selected_mode = "E"  //"P", "E", "I", "D"
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -47,6 +50,21 @@ class TrajectoryRegressor(private val context: Context) {
       }
     }
     return task.task
+  }
+
+  private fun selectInitModel() {
+    var tfla_info = TflaInfo(context)
+    tfla_info.parse("tfla_info.json")
+
+    //if we like to try normal model
+    model_filename = tfla_info.get_model_filename(selected_mode)
+    model_sgn_filename = tfla_info.get_model_filename_sgn(selected_mode)
+
+    mmsj = MwModelSgnJson(context)
+    mmsj!!.parse(model_sgn_filename)
+
+    model_description = mmsj!!.get_model_description()
+
   }
 
   private fun is_in_same_shape(shape1: IntArray, shape2: Array<Int>):Boolean {
@@ -168,32 +186,25 @@ class TrajectoryRegressor(private val context: Context) {
     return String(formArray)
   }
 
-  private fun readFileNames() {
-    var tfla_info = TflaInfo(context)
-    tfla_info.parse("tfla_info.json")
-
-    var select_mode = "E"  //"P", "E", "I"
-
-    //if we like to try normal model
-    model_filename = tfla_info.get_model_filename(select_mode)
-    model_sgn_filename = tfla_info.get_model_filename_sgn(select_mode)
-
-    mmsj = MwModelSgnJson(context)
-    mmsj!!.parse(model_sgn_filename)
-
-  }
-
+  
   //ethan: alter the model_file_name
   fun getModelFileName(): String {
     if (model_filename.length == 0) {
-      readFileNames()
+      selectInitModel()
     }
     return model_filename
   }
 
+  fun getModelDescription(): String {
+    if (model_filename.length == 0) {
+      selectInitModel()
+    }
+    return model_description
+  }
+
   fun getModelSgnFileName(): String {
     if (model_sgn_filename.length == 0) {
-      readFileNames()
+      selectInitModel()
     }
     return model_sgn_filename
   }
@@ -202,13 +213,13 @@ class TrajectoryRegressor(private val context: Context) {
     model_filename = getModelFileName()
     var iocs = ""
     if (model_filename.contains("_P.tflite")) {
-      iocs = "/T4"
-
-    } else if (model_filename.contains("_O.tflite")) {
-      iocs = "/T4"
-
+      iocs = "NNAPI/T4"
     } else if (model_filename.contains("_E.tflite")) {
-      iocs =  "/NNAPI/T4"
+      iocs = "/NNAPI/T4"
+    } else if (model_filename.contains("_I.tflite")) {
+      iocs = "/NNAPI/T4"
+    } else if (model_filename.contains("_D.tflite")) {
+      iocs = "/T4"
     }
     return iocs
   }

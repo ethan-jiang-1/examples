@@ -55,9 +55,6 @@ class TflaInfo(private val context: Context) {
     return root.getString(node_name)
   }
 
-
-
-
   @Throws(IOException::class)
   private fun readJsonAsset(assetManager: AssetManager, fileName: String): String {
     val file = assetManager.open(fileName)

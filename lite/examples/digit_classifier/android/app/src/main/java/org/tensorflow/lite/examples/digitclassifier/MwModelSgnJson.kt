@@ -29,6 +29,7 @@ class MwModelSgnJson(private val context: Context) {
   private var input_x_acc = -1
   private var output_y_delta_p = -1
   private var output_y_delta_q = -1
+  private var model_description = ""
 
 
   private fun parse_data() {
@@ -42,6 +43,7 @@ class MwModelSgnJson(private val context: Context) {
     input_x_acc = root.getInt("input_x_acc")
     output_y_delta_p = root.getInt("output_y_delta_p")
     output_y_delta_q = root.getInt("output_y_delta_q")
+    model_description = root.getString("model_size")
   }
 
   @Throws(IOException::class)
@@ -69,6 +71,10 @@ class MwModelSgnJson(private val context: Context) {
 
   fun get_output_y_delta_q():Int {
     return output_y_delta_q
+  }
+
+  fun get_model_description(): String {
+    return model_description
   }
 
 

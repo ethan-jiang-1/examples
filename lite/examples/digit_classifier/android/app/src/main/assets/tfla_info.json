@@ -1,10 +1,8 @@
 {
-    "modelP": "Mw_heavyC1Md6q_eval_P.tflite",
-    "modelP_sgn": "Mw_heavyC1Md6q_eval_P_sgn.json",
-    "modelE": "Mw_heavyC1Md6q_eval_E.tflite",
-    "modelE_sgn": "Mw_heavyC1Md6q_eval_E_sgn.json",
-    "modelI": "Mw_heavyC1Md6q_eval_I.tflite",
-    "modelI_sgn": "Mw_heavyC1Md6q_eval_I_sgn.json",
+    "modelP": "Mw_heavyB9Mc6q_eval_P.tflite",
+    "modelP_sgn": "Mw_heavyB9Mc6q_eval_P_sgn.json",
+    "modelE": "Mw_heavyB9Mc6q_eval_E.tflite",
+    "modelE_sgn": "Mw_heavyB9Mc6q_eval_E_sgn.json",
     "dataset_name": "nclt",
     "sample_step": 20,
     "imu_files": [

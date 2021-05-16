@@ -10,4 +10,5 @@
   <string name="tfe_dc_model_text_placeholder" translatable="false">Model Name</string>
   <string name="tfe_dc_pump_text_placeholder" translatable="false">Pump Name</string>
   <string name="tfe_dc_classification_error_message" translatable="false">Error classifying drawing: %s</string>
+  <string name="tfe_dc_model_description" translatable="false">ModelDescription</string>
 </resources>
