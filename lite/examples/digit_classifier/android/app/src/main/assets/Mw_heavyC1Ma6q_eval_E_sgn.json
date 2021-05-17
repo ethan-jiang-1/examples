@@ -9,7 +9,7 @@
             3
         ],
         "shape_signature": [
-            -1,
+            1,
             200,
             3
         ],
@@ -30,7 +30,7 @@
             3
         ],
         "shape_signature": [
-            -1,
+            1,
             200,
             3
         ],
@@ -45,13 +45,13 @@
     "outputs_num": 2,
     "output_0": {
         "name": "StatefulPartitionedCall:1",
-        "index": "158",
+        "index": "132",
         "shape": [
             1,
             4
         ],
         "shape_signature": [
-            -1,
+            1,
             4
         ],
         "dtype": "<class 'numpy.float32'>",
@@ -64,13 +64,13 @@
     "output_y_delta_q": 0,
     "output_1": {
         "name": "StatefulPartitionedCall:0",
-        "index": "183",
+        "index": "125",
         "shape": [
             1,
             3
         ],
         "shape_signature": [
-            -1,
+            1,
             3
         ],
         "dtype": "<class 'numpy.float32'>",
@@ -81,6 +81,6 @@
         "sgn_order": 1
     },
     "output_y_delta_p": 1,
-    "model_name": "Mw_heavyB9Mc6q_eval_P.tflite",
-    "model_size": 725908
+    "model_name": "Mw_heavyC1Ma6q_eval_E.tflite",
+    "model_size": 402160
 }

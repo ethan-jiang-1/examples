@@ -17,6 +17,27 @@ import java.util.concurrent.Executors
 
 import org.json.JSONObject
 
+import org.tensorflow.lite.gpu.CompatibilityList
+import org.tensorflow.lite.gpu.GpuDelegate
+
+/*
+import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.gpu.CompatibilityList
+import org.tensorflow.lite.gpu.GpuDelegate
+val compatList = CompatibilityList()
+
+val options = Interpreter.Options().apply{
+  if(compatList.isDelegateSupportedOnThisDevice){
+    // if the device has a supported GPU, add the GPU delegate
+    val delegateOptions = compatList.bestOptionsForThisDevice
+    this.addDelegate(GpuDelegate(delegateOptions))
+  } else {
+    // if the GPU is not supported, run on 4 threads
+    this.setNumThreads(4)
+  }
+}
+*/
+
 class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
   var isInitialized = false
@@ -35,6 +56,22 @@ class TrajectoryRegressor(private val context: Context) {
   private var mmsj: MwModelSgnJson? = null
 
   private var selected_mode = "E"  //"P", "E", "I", "D"
+
+
+  public fun getInterpreterOptionsControllStr(): String {
+    model_filename = getModelFileName()
+    var iocs = ""
+    if (model_filename.contains("_P.tflite")) {
+      iocs = "/T4"
+    } else if (model_filename.contains("_E.tflite")) {
+      iocs = "/NNAPI"
+    } else if (model_filename.contains("_I.tflite")) {
+      iocs = "/NNAPI"
+    } else if (model_filename.contains("_D.tflite")) {
+      iocs = "/T4"
+    }
+    return iocs
+  }
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -207,21 +244,6 @@ class TrajectoryRegressor(private val context: Context) {
       selectInitModel()
     }
     return model_sgn_filename
-  }
-
-  public fun getInterpreterOptionsControllStr(): String {
-    model_filename = getModelFileName()
-    var iocs = ""
-    if (model_filename.contains("_P.tflite")) {
-      iocs = "NNAPI/T4"
-    } else if (model_filename.contains("_E.tflite")) {
-      iocs = "/NNAPI/T4"
-    } else if (model_filename.contains("_I.tflite")) {
-      iocs = "/NNAPI/T4"
-    } else if (model_filename.contains("_D.tflite")) {
-      iocs = "/T4"
-    }
-    return iocs
   }
 
 
