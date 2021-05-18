@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
   private fun setup_estimator() {
     //Init pumper
     pumper = PumpMgr(this)
-    val pump_mode = "capData:tfla_cap_data_0.json"
+    val pump_mode = "capData:tfla_cap_data_100Hz_0.json"
     var init_ret = pumper!!.init(pump_mode)
 
     // Setup trajector Regressor
@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
       .initialize(pumper!!)
       .addOnFailureListener { e -> Log.e(TAG, "Error to setting up trajectory regressor.", e) }
 
-    modelTextView?.text = trajectoryRegressor.getModelFileName() + trajectoryRegressor.getInterpreterOptionsControllStr()
+    modelTextView?.text = trajectoryRegressor.getModelFileName()
     pumpTextView?.text = pump_mode
     modelDescriptionView?.text = trajectoryRegressor.getModelDescription()
   }
@@ -164,7 +164,7 @@ class MainActivity : AppCompatActivity() {
     super.onDestroy()
   }
 
-  private fun classifyDrawing() {
+//  private fun classifyDrawing() {
 //    val bitmap = drawView?.getBitmap()
 //
 //    if ((bitmap != null) && (digitClassifier.isInitialized)) {
@@ -179,14 +179,20 @@ class MainActivity : AppCompatActivity() {
 //          Log.e(TAG, "Error classifying drawing.", e)
 //        }
 //    }
-  }
+//  }
 
+  private fun update_result(resultText:String) {
+    var results = resultText.split("|")
+
+    predictedTextView?.text = results[1]
+    modelDescriptionView?.text = results[2]
+  }
 
   private fun estimateTrajectory(est_mode:String) {
     if (trajectoryRegressor.isInitialized) {
        trajectoryRegressor
          .estimateAsyc(est_mode)
-         .addOnSuccessListener { resultText -> predictedTextView?.text = resultText }
+         .addOnSuccessListener { resultText -> update_result(resultText) }
     }
   }
 

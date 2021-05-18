@@ -45,7 +45,7 @@
     "outputs_num": 2,
     "output_0": {
         "name": "StatefulPartitionedCall:1",
-        "index": "154",
+        "index": "160",
         "shape": [
             1,
             4
@@ -64,7 +64,7 @@
     "output_y_delta_q": 0,
     "output_1": {
         "name": "StatefulPartitionedCall:0",
-        "index": "144",
+        "index": "149",
         "shape": [
             1,
             3
@@ -82,5 +82,34 @@
     },
     "output_y_delta_p": 1,
     "model_name": "Mw_heavyC1Ma6q_eval_P.tflite",
-    "model_size": 796552
+    "model_size": 774580,
+    "converter": {
+        "converter": {
+            "inference_input_type": "<dtype: 'float32'>",
+            "inference_output_type": "<dtype: 'float32'>",
+            "optimizations": "[]",
+            "target_spec.supported_ops": "{<OpsSet.TFLITE_BUILTINS: 'TFLITE_BUILTINS'>}",
+            "target_spec.supported_types": "[]"
+        },
+        "tf_model": {
+            "model.name": "pm_heavyC1Ma6q",
+            "model_size": 832072
+        },
+        "tflite_model": {
+            "size": 774580,
+            "downsize_ratio": "0.93"
+        },
+        "result": "tflite_mobile_models/Mw_heavyC1Ma6q_eval_P.tflite",
+        "conversion_name": "Plain:No optimization",
+        "converter_klass": "<class 'e_tflite.ex_tfl_converter_plain.TflConverterPlain'>",
+        "tf.version": "2.4.0"
+    },
+    "git_version": {
+        "version": "0.0.10",
+        "full": "bf13faa5e678456dc3d160db01574d1b4ccf6a9a"
+    },
+    "version_git": "0.0.10",
+    "version_tf": "2.4.0",
+    "version_py": "3.6.12 |Anaconda, Inc.| (default, Sep  8 2020, 17:50:39) \n[GCC Clang 10.0.0 ]",
+    "feed_mode": "100Hz"
 }

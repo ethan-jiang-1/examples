@@ -17,8 +17,8 @@ import java.util.concurrent.Executors
 
 import org.json.JSONObject
 
-import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
+//import org.tensorflow.lite.gpu.CompatibilityList
+//import org.tensorflow.lite.gpu.GpuDelegate
 
 
 
@@ -40,23 +40,11 @@ class TrajectoryRegressor(private val context: Context) {
   private var pumper: PumpMgr? = null
   private var mmsj: MwModelSgnJson? = null
 
-  private var selected_mode = "E"  //"P", "E", "I", "D"
+  private var using_tf250_options = false
+  private var selected_mode = "F"  //"P", "F", "D", "I"
 
+  private var option_ctrl_str = ""
 
-  public fun getInterpreterOptionsControllStr(): String {
-    model_filename = getModelFileName()
-    var iocs = ""
-    if (model_filename.contains("_P.tflite")) {
-      iocs = "/T4"
-    } else if (model_filename.contains("_E.tflite")) {
-      iocs = "/NNAPI"
-    } else if (model_filename.contains("_I.tflite")) {
-      iocs = "/NNAPI"
-    } else if (model_filename.contains("_D.tflite")) {
-      iocs = "/T4"
-    }
-    return iocs
-  }
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -147,6 +135,111 @@ class TrajectoryRegressor(private val context: Context) {
 
   }
 
+  private fun get_option250(): Interpreter.Options {
+    /*
+    Log.i(TAG, "GET_OPTIONS_250")
+
+    val compatList = CompatibilityList()
+
+    val options = Interpreter.Options().apply{
+      if(compatList.isDelegateSupportedOnThisDevice){
+        Log.i(TAG, "Options: Delegate suppored")
+        // if the device has a supported GPU, add the GPU delegate
+        if (true) {
+          val delegateOptions = compatList.bestOptionsForThisDevice
+          this.addDelegate(GpuDelegate(delegateOptions))
+
+          // the default is 0, true, true here
+          //public static final int INFERENCE_PREFERENCE_FAST_SINGLE_ANSWER = 0;
+          //public static final int INFERENCE_PREFERENCE_SUSTAINED_SPEED = 1;
+          //boolean precisionLossAllowed = true;
+          //boolean quantizedModelsAllowed = true;
+          //int inferencePreference = 0;
+
+        } else {
+          val delegateOptions = GpuDelegate.Options()
+
+          delegateOptions.setInferencePreference(GpuDelegate.Options.INFERENCE_PREFERENCE_FAST_SINGLE_ANSWER)
+          //delegateOptions.setInferencePreference(GpuDelegate.Options.INFERENCE_PREFERENCE_SUSTAINED_SPEED)
+
+          delegateOptions.setQuantizedModelsAllowed(true)
+          //delegateOptions.setQuantizedModelsAllowed(false)
+
+          delegateOptions.setPrecisionLossAllowed(true)
+          //delegateOptions.setPrecisionLossAllowed(false)
+
+          this.addDelegate(GpuDelegate(delegateOptions))
+        }
+
+        option_ctrl_str = "bo @250"
+      } else {
+        Log.i(TAG, "Options: no Delegate support")
+        // if the GPU is not supported, run on 4 threads
+        this.setNumThreads(4)
+        option_ctrl_str = "4 @250"
+      }
+    }
+    return options
+     */
+    val options = Interpreter.Options()
+    return options
+  }
+
+  private fun get_option240(): Interpreter.Options {
+    Log.i(TAG, "GET_OPTIONS_240")
+    // Initialize TF Lite Interpreter with NNAPI enabled
+
+    val options = Interpreter.Options()
+
+    // It seems that in 2.5.0 engine, the old approach to setup options does not impact anything really....
+    model_filename = getModelFileName()
+    var iocs = ""
+    if (model_filename.contains("_P.tflite")) {
+      iocs = "/T4"
+    } else if (model_filename.contains("_F.tflite")) {
+      //iocs = "/T4/XNNPACK"
+      iocs = "/T4/NNAPI"
+    } else if (model_filename.contains("_I.tflite")) {
+      iocs = "/XNNPACK"
+    } else if (model_filename.contains("_D.tflite")) {
+      iocs = "/T4/XNNPACK"
+    }
+
+
+    //Ethan: disable NNAPI for now
+    var msg = ""
+    if (iocs.contains("/NNAPI")) {
+      //options.setAllowFp16PrecisionForFp32(true)
+      options.setAllowBufferHandleOutput(true)
+      options.setUseNNAPI(true)
+      msg += "NNAPI FP16 BHO "
+    } else if (iocs.contains("/XNNPACK")) {
+      options.setUseXNNPACK(true)
+      options.setAllowFp16PrecisionForFp32(true)
+      options.setAllowBufferHandleOutput(true)
+
+      msg += "XNNPACK FP16 BHO "
+    }
+
+    if (iocs.contains("/T4")) {
+      msg += "T4"
+      options.setNumThreads(4)
+    }
+
+    Log.d(TAG, "Interpreter Options: " + msg)
+
+    option_ctrl_str = iocs + " " + msg + " @240"
+    return options
+  }
+
+  private fun get_options(): Interpreter.Options
+  {
+    return if (using_tf250_options) {
+      get_option250()
+    } else {
+      get_option240()
+    }
+  }
 
   @Throws(IOException::class)
   private fun initializeInterpreter() {
@@ -156,39 +249,7 @@ class TrajectoryRegressor(private val context: Context) {
     val model = loadModelFile(assetManager)
 
 
-    val compatList = CompatibilityList()
-
-    val options = Interpreter.Options().apply{
-      if(compatList.isDelegateSupportedOnThisDevice){
-        // if the device has a supported GPU, add the GPU delegate
-        val delegateOptions = compatList.bestOptionsForThisDevice
-        this.addDelegate(GpuDelegate(delegateOptions))
-      } else {
-        // if the GPU is not supported, run on 4 threads
-        this.setNumThreads(4)
-      }
-    }
-
-    // Initialize TF Lite Interpreter with NNAPI enabled
-
-    //val options = Interpreter.Options()
-
-    //val iocs = getInterpreterOptionsControllStr()
-
-
-    //Ethan: disable NNAPI for now
-    //if (iocs.contains("/NNAPI")) {
-    //  Log.d(TAG, "Interpreter Options: use NNAPI ")
-    //  options.setUseNNAPI(true)
-    //}
-
-    //if (iocs.contains("/T2")) {
-    //  Log.d(TAG, "Interpreter Options: Thread 2")
-    //  options.setNumThreads(2)
-    //} else if (iocs.contains("/T4")) {
-    //  Log.d(TAG, "Interpreter Options: Thread 4")
-    //  options.setNumThreads(4)
-    //}
+    var options = get_options()
 
     val interpreter = Interpreter(model, options)
 
@@ -304,7 +365,7 @@ class TrajectoryRegressor(private val context: Context) {
 
     pumper!!.respOutputs(outputs, round, mmsj!!)
 
-    return "OK: span100: " + elapsedTimeMs + " ms/100loops"
+    return "OK: |span100: " + elapsedTimeMs + " ms/100loops"  + "|option: " + option_ctrl_str
   }
 
   fun estimateAsyc(est_mode:String): Task<String> {
