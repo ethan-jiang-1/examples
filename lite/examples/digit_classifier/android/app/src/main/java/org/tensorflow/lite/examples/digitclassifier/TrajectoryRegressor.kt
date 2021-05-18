@@ -20,23 +20,8 @@ import org.json.JSONObject
 import org.tensorflow.lite.gpu.CompatibilityList
 import org.tensorflow.lite.gpu.GpuDelegate
 
-/*
-import org.tensorflow.lite.Interpreter
-import org.tensorflow.lite.gpu.CompatibilityList
-import org.tensorflow.lite.gpu.GpuDelegate
-val compatList = CompatibilityList()
 
-val options = Interpreter.Options().apply{
-  if(compatList.isDelegateSupportedOnThisDevice){
-    // if the device has a supported GPU, add the GPU delegate
-    val delegateOptions = compatList.bestOptionsForThisDevice
-    this.addDelegate(GpuDelegate(delegateOptions))
-  } else {
-    // if the GPU is not supported, run on 4 threads
-    this.setNumThreads(4)
-  }
-}
-*/
+
 
 class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
@@ -170,25 +155,40 @@ class TrajectoryRegressor(private val context: Context) {
     val assetManager = context.assets
     val model = loadModelFile(assetManager)
 
+
+    val compatList = CompatibilityList()
+
+    val options = Interpreter.Options().apply{
+      if(compatList.isDelegateSupportedOnThisDevice){
+        // if the device has a supported GPU, add the GPU delegate
+        val delegateOptions = compatList.bestOptionsForThisDevice
+        this.addDelegate(GpuDelegate(delegateOptions))
+      } else {
+        // if the GPU is not supported, run on 4 threads
+        this.setNumThreads(4)
+      }
+    }
+
     // Initialize TF Lite Interpreter with NNAPI enabled
 
-    val options = Interpreter.Options()
+    //val options = Interpreter.Options()
 
-    val iocs = getInterpreterOptionsControllStr()
+    //val iocs = getInterpreterOptionsControllStr()
+
 
     //Ethan: disable NNAPI for now
-    if (iocs.contains("/NNAPI")) {
-      Log.d(TAG, "Interpreter Options: use NNAPI ")
-      options.setUseNNAPI(true)
-    }
+    //if (iocs.contains("/NNAPI")) {
+    //  Log.d(TAG, "Interpreter Options: use NNAPI ")
+    //  options.setUseNNAPI(true)
+    //}
 
-    if (iocs.contains("/T2")) {
-      Log.d(TAG, "Interpreter Options: Thread 2")
-      options.setNumThreads(2)
-    } else if (iocs.contains("/T4")) {
-      Log.d(TAG, "Interpreter Options: Thread 4")
-      options.setNumThreads(4)
-    }
+    //if (iocs.contains("/T2")) {
+    //  Log.d(TAG, "Interpreter Options: Thread 2")
+    //  options.setNumThreads(2)
+    //} else if (iocs.contains("/T4")) {
+    //  Log.d(TAG, "Interpreter Options: Thread 4")
+    //  options.setNumThreads(4)
+    //}
 
     val interpreter = Interpreter(model, options)
 
