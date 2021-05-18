@@ -126,6 +126,22 @@ class TrajectoryRegressor(private val context: Context) {
   }
 
 
+  public fun getInterpreterOptionsControllStr(): String {
+    model_filename = getModelFileName()
+    var iocs = ""
+    if (model_filename.contains("_P.tflite")) {
+      iocs = "NNAPI/T4"
+    } else if (model_filename.contains("_E.tflite")) {
+      iocs = "/NNAPI/T4"
+    } else if (model_filename.contains("_I.tflite")) {
+      iocs = "/NNAPI/T4"
+    } else if (model_filename.contains("_D.tflite")) {
+      iocs = "/T4"
+    }
+    return iocs
+  }
+
+
   @Throws(IOException::class)
   private fun initializeInterpreter() {
     Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
@@ -207,21 +223,6 @@ class TrajectoryRegressor(private val context: Context) {
       selectInitModel()
     }
     return model_sgn_filename
-  }
-
-  public fun getInterpreterOptionsControllStr(): String {
-    model_filename = getModelFileName()
-    var iocs = ""
-    if (model_filename.contains("_P.tflite")) {
-      iocs = "NNAPI/T4"
-    } else if (model_filename.contains("_E.tflite")) {
-      iocs = "/NNAPI/T4"
-    } else if (model_filename.contains("_I.tflite")) {
-      iocs = "/NNAPI/T4"
-    } else if (model_filename.contains("_D.tflite")) {
-      iocs = "/T4"
-    }
-    return iocs
   }
 
 
