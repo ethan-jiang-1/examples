@@ -34,7 +34,7 @@ class TrajectoryRegressor(private val context: Context) {
   private var pumper: PumpMgr? = null
   private var mmsj: MwModelSgnJson? = null
 
-  private var selected_mode = "E"  //"P", "E", "I", "D"
+  private var selected_mode = "F"  //"P", "F", "I", "D"
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -131,7 +131,7 @@ class TrajectoryRegressor(private val context: Context) {
     var iocs = ""
     if (model_filename.contains("_P.tflite")) {
       iocs = "NNAPI/T4"
-    } else if (model_filename.contains("_E.tflite")) {
+    } else if (model_filename.contains("_F.tflite")) {
       iocs = "/NNAPI/T4"
     } else if (model_filename.contains("_I.tflite")) {
       iocs = "/NNAPI/T4"

@@ -1,7 +1,8 @@
 {
     "cap_filename": "ds1/ds_NCLT/2012-01-08_04/imu.csv",
     "cap_num": 3,
-    "cap_0": "mobile_asset/tfla_cap_data_0.json",
-    "cap_1": "mobile_asset/tfla_cap_data_1.json",
-    "cap_2": "mobile_asset/tfla_cap_data_2.json"
+    "feed_mode": "100Hz",
+    "cap_0": "mobile_asset/tfla_cap_data_100Hz_0.json",
+    "cap_1": "mobile_asset/tfla_cap_data_100Hz_1.json",
+    "cap_2": "mobile_asset/tfla_cap_data_100Hz_2.json"
 }

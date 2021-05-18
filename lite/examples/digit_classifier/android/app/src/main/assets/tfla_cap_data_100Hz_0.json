@@ -2052,5 +2052,6 @@
     },
     "cap_order": 0,
     "cap_filename": "ds1/ds_NCLT/2012-01-08_04/imu.csv",
-    "imu_filename": "ds1-ds_NCLT-2012-01-08_04-imu.csv"
+    "imu_filename": "ds1-ds_NCLT-2012-01-08_04-imu.csv",
+    "feed_mode": "100Hz"
 }

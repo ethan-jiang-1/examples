@@ -140,7 +140,7 @@ class MainActivity : AppCompatActivity() {
   private fun setup_estimator() {
     //Init pumper
     pumper = PumpMgr(this)
-    val pump_mode = "capData:tfla_cap_data_0.json"
+    val pump_mode = "capData:tfla_cap_data_100Hz_0.json"
     var init_ret = pumper!!.init(pump_mode)
 
     // Setup trajector Regressor
