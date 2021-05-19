@@ -9,7 +9,7 @@
             3
         ],
         "shape_signature": [
-            -1,
+            1,
             200,
             3
         ],
@@ -30,7 +30,7 @@
             3
         ],
         "shape_signature": [
-            -1,
+            1,
             200,
             3
         ],
@@ -45,13 +45,13 @@
     "outputs_num": 2,
     "output_0": {
         "name": "StatefulPartitionedCall:1",
-        "index": "158",
+        "index": "96",
         "shape": [
             1,
             4
         ],
         "shape_signature": [
-            -1,
+            1,
             4
         ],
         "dtype": "<class 'numpy.float32'>",
@@ -64,13 +64,13 @@
     "output_y_delta_q": 0,
     "output_1": {
         "name": "StatefulPartitionedCall:0",
-        "index": "183",
+        "index": "89",
         "shape": [
             1,
             3
         ],
         "shape_signature": [
-            -1,
+            1,
             3
         ],
         "dtype": "<class 'numpy.float32'>",
@@ -81,34 +81,34 @@
         "sgn_order": 1
     },
     "output_y_delta_p": 1,
-    "model_name": "Mw_heavyB9Mc6q_eval_P.tflite",
-    "model_size": 725908,
+    "model_name": "Mw_heavyC7Mb6q_eval_F.tflite",
+    "model_size": 256112,
     "converter": {
         "converter": {
             "inference_input_type": "<dtype: 'float32'>",
             "inference_output_type": "<dtype: 'float32'>",
-            "optimizations": "[]",
-            "target_spec.supported_ops": "{<OpsSet.TFLITE_BUILTINS: 'TFLITE_BUILTINS'>}",
-            "target_spec.supported_types": "[]"
+            "optimizations": "[<Optimize.DEFAULT: 'DEFAULT'>]",
+            "target_spec.supported_ops": "[<OpsSet.TFLITE_BUILTINS: 'TFLITE_BUILTINS'>, <OpsSet.SELECT_TF_OPS: 'SELECT_TF_OPS'>]",
+            "target_spec.supported_types": "[tf.float16]"
         },
         "tf_model": {
-            "model.name": "pm_heavyB9Mc6q",
-            "model_size": 789176
+            "model.name": "pm_heavyC7Mb6q",
+            "model_size": 541816
         },
         "tflite_model": {
-            "size": 725908,
-            "downsize_ratio": "0.92"
+            "size": 256112,
+            "downsize_ratio": "0.47"
         },
-        "result": "tflite_mobile_models/Mw_heavyB9Mc6q_eval_P.tflite",
-        "conversion_name": "Plain:No optimization",
-        "converter_klass": "<class 'e_tflite.ex_tfl_converter_plain.TflConverterPlain'>",
+        "result": "tflite_mobile_models/Mw_heavyC7Mb6q_eval_F.tflite",
+        "conversion_name": "FP16|Float16 quantization",
+        "converter_klass": "<class 'e_tflite.ex_tfl_converter_fp16.TflConverterFP16'>",
         "tf.version": "2.4.0"
     },
     "git_version": {
-        "version": "0.0.10-dirty",
-        "full": "bf13faa5e678456dc3d160db01574d1b4ccf6a9a-dirty"
+        "version": "0.0.10-19-gf32aca9-dirty",
+        "full": "f32aca97f39f0648f4af09bbccb72b014e358277-dirty"
     },
-    "version_git": "0.0.10-dirty",
+    "version_git": "0.0.10-19-gf32aca9-dirty",
     "version_tf": "2.4.0",
     "version_py": "3.6.12 |Anaconda, Inc.| (default, Sep  8 2020, 17:50:39) \n[GCC Clang 10.0.0 ]",
     "feed_mode": "100Hz"
