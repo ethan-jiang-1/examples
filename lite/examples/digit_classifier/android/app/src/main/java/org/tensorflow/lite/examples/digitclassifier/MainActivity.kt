@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity() {
 
   private fun do_show_result(estimate_result:String) {
     predictedTextView?.text = estimate_result
-    modelDescriptionView?.text = trajectoryRegressor.getModelDescription() + " " +  trajectoryRegressor.getSelectedOptionStr()
+    modelDescriptionView?.text = trajectoryRegressor.getModelDescription() + "\n" +  trajectoryRegressor.getSelectedOptionStr()
   }
 
 
