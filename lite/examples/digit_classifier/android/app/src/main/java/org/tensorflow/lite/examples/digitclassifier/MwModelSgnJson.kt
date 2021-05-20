@@ -43,7 +43,18 @@ class MwModelSgnJson(private val context: Context) {
     input_x_acc = root.getInt("input_x_acc")
     output_y_delta_p = root.getInt("output_y_delta_p")
     output_y_delta_q = root.getInt("output_y_delta_q")
-    model_description = root.getString("model_size")
+
+
+    var model_size = root.getString("model_size")
+    var version_git = root.getString("version_git")
+    var feed_mode = root.getString("feed_mode")
+
+    var converter = root.getJSONObject("converter")
+    var converter_model = converter.getJSONObject("model")
+    var downsize_ratio = converter_model.getString("tflite_model.downsize_ratio")
+
+    model_description = model_size + " " + downsize_ratio + "\n"
+    model_description += version_git + " " + feed_mode
   }
 
   @Throws(IOException::class)
