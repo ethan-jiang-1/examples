@@ -149,7 +149,7 @@ class MainActivity : AppCompatActivity() {
       .initialize(pumper!!)
       .addOnFailureListener { e -> Log.e(TAG, "Error to setting up trajectory regressor.", e) }
 
-    modelTextView?.text = trajectoryRegressor.getModelFileName() + trajectoryRegressor.getInterpreterOptionsControllStr()
+    modelTextView?.text = trajectoryRegressor.getModelFileName() + trajectoryRegressor.getSelectedOptionStr()
     pumpTextView?.text = pump_mode
     modelDescriptionView?.text = trajectoryRegressor.getModelDescription()
   }
@@ -181,12 +181,16 @@ class MainActivity : AppCompatActivity() {
 //    }
   }
 
+  private fun do_show_result(resultText:String) {
+    predictedTextView?.text = resultText
+  }
+
 
   private fun estimateTrajectory(est_mode:String) {
     if (trajectoryRegressor.isInitialized) {
        trajectoryRegressor
          .estimateAsyc(est_mode)
-         .addOnSuccessListener { resultText -> predictedTextView?.text = resultText }
+         .addOnSuccessListener { resultText -> do_show_result(resultText) }
     }
   }
 

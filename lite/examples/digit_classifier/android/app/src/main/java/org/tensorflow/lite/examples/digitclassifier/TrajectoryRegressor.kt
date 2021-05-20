@@ -2,7 +2,6 @@ package org.tensorflow.lite.examples.digitclassifier
 
 import android.content.Context
 import android.content.res.AssetManager
-import android.graphics.Bitmap
 import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
@@ -10,12 +9,9 @@ import org.tensorflow.lite.Interpreter
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
-import java.nio.ByteOrder
 import java.nio.channels.FileChannel
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
-
-import org.json.JSONObject
 
 class TrajectoryRegressor(private val context: Context) {
   private var interpreter: Interpreter? = null
@@ -35,6 +31,7 @@ class TrajectoryRegressor(private val context: Context) {
   private var mmsj: MwModelSgnJson? = null
 
   private var selected_mode = "F"  //"P", "F", "I", "D"
+  private var selected_options_str = ""
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -126,7 +123,15 @@ class TrajectoryRegressor(private val context: Context) {
   }
 
 
-  public fun getInterpreterOptionsControllStr(): String {
+  public fun getSelectedOptionStr(): String {
+    return selected_options_str
+  }
+
+  private fun get_options_classic(): Interpreter.Options
+  {
+
+    val options = Interpreter.Options()
+
     model_filename = getModelFileName()
     var iocs = ""
     if (model_filename.contains("_P.tflite")) {
@@ -138,22 +143,6 @@ class TrajectoryRegressor(private val context: Context) {
     } else if (model_filename.contains("_D.tflite")) {
       iocs = "/T4"
     }
-    return iocs
-  }
-
-
-  @Throws(IOException::class)
-  private fun initializeInterpreter() {
-    Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
-    // Load the TF Lite model
-    val assetManager = context.assets
-    val model = loadModelFile(assetManager)
-
-    // Initialize TF Lite Interpreter with NNAPI enabled
-
-    val options = Interpreter.Options()
-
-    val iocs = getInterpreterOptionsControllStr()
 
     //Ethan: disable NNAPI for now
     if (iocs.contains("/NNAPI")) {
@@ -168,6 +157,21 @@ class TrajectoryRegressor(private val context: Context) {
       Log.d(TAG, "Interpreter Options: Thread 4")
       options.setNumThreads(4)
     }
+
+    selected_options_str = iocs
+    return options
+  }
+
+  @Throws(IOException::class)
+  private fun initializeInterpreter() {
+    Log.i(TAG, "TrajectoryRegressor:initializeInterpreter, Initial TFList started...")
+    // Load the TF Lite model
+    val assetManager = context.assets
+    val model = loadModelFile(assetManager)
+
+    // Initialize TF Lite Interpreter with NNAPI enabled
+
+    val options = get_options_classic()
 
     val interpreter = Interpreter(model, options)
 
@@ -283,7 +287,11 @@ class TrajectoryRegressor(private val context: Context) {
 
     pumper!!.respOutputs(outputs, round, mmsj!!)
 
-    return "OK: span100: " + elapsedTimeMs + " ms/100loops"
+    var estimate_result = ""
+    estimate_result += "Span100: " + elapsedTimeMs + " ms/100loops\n"
+    estimate_result += "Comments\n"
+    estimate_result += "Note\n"
+    return estimate_result
   }
 
   fun estimateAsyc(est_mode:String): Task<String> {
