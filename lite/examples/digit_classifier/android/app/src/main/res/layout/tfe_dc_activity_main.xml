@@ -9,16 +9,15 @@
 
   <TextView
       android:id="@+id/model_description"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
+      android:layout_width="265dp"
+      android:layout_height="39dp"
+      android:layout_marginBottom="28dp"
       android:text="@string/tfe_dc_model_description"
       android:textSize="14sp"
       android:textStyle="bold"
       app:layout_constraintBottom_toTopOf="@+id/pump_text"
       app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/draw_view"
-      app:layout_constraintVertical_bias="0.787" />
+      app:layout_constraintRight_toRightOf="parent" />
 
   <Button
       android:id="@+id/start_one_button"
@@ -87,12 +86,12 @@
       android:id="@+id/pump_text"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="68dp"
+      android:layout_marginBottom="56dp"
       android:text="@string/tfe_dc_pump_text_placeholder"
       android:textSize="14sp"
       android:textStyle="bold"
-      app:layout_constraintBottom_toTopOf="@+id/model_text"
-      app:layout_constraintHorizontal_bias="0.474"
+      app:layout_constraintBottom_toTopOf="@+id/predicted_text"
+      app:layout_constraintHorizontal_bias="0.48"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent" />
 
@@ -100,14 +99,16 @@
       android:id="@+id/model_text"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginBottom="52dp"
+      android:layout_marginTop="72dp"
       android:text="@string/tfe_dc_model_text_placeholder"
       android:textSize="14sp"
       android:textStyle="bold"
-      app:layout_constraintBottom_toTopOf="@+id/predicted_text"
-      app:layout_constraintHorizontal_bias="0.471"
+      app:layout_constraintBottom_toTopOf="@+id/model_description"
+      app:layout_constraintHorizontal_bias="0.477"
       app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent" />
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toBottomOf="@+id/draw_view"
+      app:layout_constraintVertical_bias="0.727" />
 
   <Button
       android:id="@+id/clear_button"
