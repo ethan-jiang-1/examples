@@ -1,0 +1,23 @@
+{
+<<<<<<< HEAD
+    "modelP": "Mw_heavyC7Me6q_eval_P.tflite",
+    "modelP_sgn": "Mw_heavyC7Me6q_eval_P_sgn.json",
+    "modelF": "Mw_heavyC7Me6q_eval_F.tflite",
+    "modelF_sgn": "Mw_heavyC7Me6q_eval_F_sgn.json",
+=======
+    "modelP": "Mw_heavyC1Ma6q_eval_P.tflite",
+    "modelP_sgn": "Mw_heavyC1Ma6q_eval_P_sgn.json",
+    "modelF": "Mw_heavyC1Ma6q_eval_F.tflite",
+    "modelF_sgn": "Mw_heavyC1Ma6q_eval_F_sgn.json",
+>>>>>>> tf25
+    "dataset_name": "nclt",
+    "sample_step": 20,
+    "imu_files": [
+        "ds1-ds_NCLT-2012-01-08_04-imu.csv",
+        "ds1-ds_NCLT-2012-01-08_09-imu.csv",
+        "ds1-ds_NCLT-2012-01-08_14-imu.csv",
+        "ds1-ds_NCLT-2012-06-15_04-imu.csv",
+        "ds1-ds_NCLT-2012-06-15_09-imu.csv",
+        "ds1-ds_NCLT-2013-01-10_02-imu.csv"
+    ]
+}
