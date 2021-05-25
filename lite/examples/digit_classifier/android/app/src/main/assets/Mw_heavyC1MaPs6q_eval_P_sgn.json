@@ -81,8 +81,8 @@
         "sgn_order": 1
     },
     "output_y_delta_p": 1,
-    "model_name": "Mw_heavyC1Ma6q_eval_P.tflite",
-    "model_size": 762956,
+    "model_name": "Mw_heavyC1MaPs6q_eval_P.tflite",
+    "model_size": 763444,
     "converter": {
         "converter": {
             "inference_input_type": "<dtype: 'float32'>",
@@ -92,13 +92,13 @@
             "target_spec.supported_types": "set()"
         },
         "model": {
-            "model.name": "pm_heavyC1Ma6q",
+            "model.name": "pm_heavyC1MaPs6q",
             "model.size": 832072,
-            "model.paper_name": "IMOT-t-m0(4x2)",
-            "tflite_model.size": 762956,
+            "model.paper_name": null,
+            "tflite_model.size": 763444,
             "tflite_model.downsize_ratio": "0.92"
         },
-        "result": "tflite_mobile_models/Mw_heavyC1Ma6q_eval_P.tflite",
+        "result": "tflite_mobile_models/Mw_heavyC1MaPs6q_eval_P.tflite",
         "conversion_name": "Plain:No optimization",
         "converter_klass": "<class 'e_tflite.ex_tfl_converter_plain.TflConverterPlain'>",
         "tf.version": "2.5.0"
