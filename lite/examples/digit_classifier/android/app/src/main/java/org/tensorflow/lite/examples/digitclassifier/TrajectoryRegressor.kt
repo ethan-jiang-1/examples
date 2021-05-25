@@ -148,6 +148,9 @@ class TrajectoryRegressor(private val context: Context) {
     if (iocs.contains("/NNAPI")) {
       Log.d(TAG, "Interpreter Options: use NNAPI ")
       options.setUseNNAPI(true)
+    } else if (iocs.contains("/XNNPACK")) {
+      Log.d(TAG, "Interperter Options: use XNNPACK")
+      options.setUseXNNPACK(true)
     }
 
     if (iocs.contains("/T2")) {
