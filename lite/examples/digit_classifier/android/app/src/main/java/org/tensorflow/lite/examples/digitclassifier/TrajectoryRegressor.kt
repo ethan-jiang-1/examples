@@ -137,7 +137,8 @@ class TrajectoryRegressor(private val context: Context) {
     if (model_filename.contains("_P.tflite")) {
       iocs = "NNAPI/T4/FP16/BHO"
     } else if (model_filename.contains("_F.tflite")) {
-      iocs = "/NNAPI/T4/BHO"
+      //iocs = "/NNAPI/T4/BHO"
+      iocs = "/XNNPACK/T4/BHO"
     } else if (model_filename.contains("_I.tflite")) {
       iocs = "/NNAPI/T4"
     } else if (model_filename.contains("_D.tflite")) {
@@ -148,6 +149,9 @@ class TrajectoryRegressor(private val context: Context) {
     if (iocs.contains("/NNAPI")) {
       Log.d(TAG, "Interpreter Options: use NNAPI ")
       options.setUseNNAPI(true)
+    } else if (iocs.contains("/XNNPACK")) {
+      Log.d(TAG, "Interpreter Options: use XNNPACK")
+      options.setUseXNNPACK(true)
     }
 
     if (iocs.contains("/T2")) {
