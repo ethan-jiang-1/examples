@@ -31,7 +31,8 @@ class TrajectoryRegressor(private val context: Context) {
 
   private var pumper: PumpMgr? = null
 
-  private var model_mode = "/NNAPI/T2"
+  //private var model_mode = "/NNAPI/T2"
+  private var model_mode = "/XNNPACK/T4"
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -118,6 +119,9 @@ class TrajectoryRegressor(private val context: Context) {
     if (model_mode.contains("/NNAPI")) {
       Log.d(TAG, "Interpreter Options: use NNAPI ")
       options.setUseNNAPI(true)
+    } else if (model_mode.contains("/XNNPACK")) {
+      Log.d(TAG, "Interpreter Options: use XNNPACK ")
+      options.setUseXNNPACK(true)
     }
 
     if (model_mode.contains("/T2")) {
