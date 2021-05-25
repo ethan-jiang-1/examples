@@ -167,10 +167,10 @@ class TrajectoryRegressor(private val context: Context) {
       tfla_info.parse("tfla_info.json")
 
       //if we likte to try experimental model
-      model_filename = tfla_info.get_model_filenameE()
+      model_filename = tfla_info.get_model_filenameF()
 
       //if we like to try normal model
-      //model_filename = tfla_info.get_model_filenameN()
+      //model_filename = tfla_info.get_model_filenameP()
     }
     return model_filename
   }
