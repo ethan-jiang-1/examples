@@ -81,7 +81,7 @@
         "sgn_order": 1
     },
     "output_y_delta_p": 1,
-    "model_name": "Mw_heavyB9MdFz6q_eval_D.tflite",
+    "model_name": "Mw_heavyB9MdFp6q_eval_D.tflite",
     "model_size": 211728,
     "converter": {
         "converter": {
@@ -98,16 +98,16 @@
             "tflite_model.size": 211728,
             "tflite_model.downsize_ratio": "0.29"
         },
-        "result": "tflite_mobile_models/Mw_heavyB9MdFz6q_eval_D.tflite",
+        "result": "tflite_mobile_models/Mw_heavyB9MdFp6q_eval_D.tflite",
         "conversion_name": "Normal:Dynamic range quantization",
         "converter_klass": "<class 'e_tflite.ex_tfl_converter_dynamic.TflConverterDynamic'>",
         "tf.version": "2.5.0"
     },
     "git_version": {
-        "version": "0.0.10-82-g78c8353-dirty",
-        "full": "78c8353d92948b9bb791703b35eaa4f00ab4f4f7-dirty"
+        "version": "0.0.10-84-gc066150-dirty",
+        "full": "c0661509a0e0756ad37b569fe0e0a9d13ffcaf39-dirty"
     },
-    "version_git": "0.0.10-82-g78c8353-dirty",
+    "version_git": "0.0.10-84-gc066150-dirty",
     "version_tf": "2.5.0",
     "version_py": "3.7.10 (default, Feb 26 2021, 10:16:00) \n[Clang 10.0.0 ]",
     "feed_mode": "100Hz"
