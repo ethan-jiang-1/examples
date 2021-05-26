@@ -20,6 +20,7 @@ import org.json.JSONObject
 import org.tensorflow.lite.Tensor
 
 class TflaCapData(private val context: Context) {
+
   private var parsed: Boolean = false
   private var fileName:String = ""
 
@@ -37,10 +38,18 @@ class TflaCapData(private val context: Context) {
     var data = cap_syhat_delta_p.getJSONArray("data")
 
     var data0 = data[0]
-    //val delta_p = FloatArray(3)
-    for (i in 0..2) {
-       var dval = (data0 as JSONArray).get(i)
-       yhat_delta_p[i] = (dval as Double).toFloat()
+
+    if (data0 is Double) {
+      // this is what we got in Fixed mode -- do not know why, but it is a experimental any way
+      for (i in 0..2) {
+        yhat_delta_p[i] = (data[i] as Double).toFloat()
+      }
+    } else {
+      //val delta_p = FloatArray(3)
+      for (i in 0..2) {
+        var dval = (data0 as JSONArray).get(i)
+        yhat_delta_p[i] = (dval as Double).toFloat()
+      }
     }
   }
 
@@ -53,10 +62,17 @@ class TflaCapData(private val context: Context) {
     var data = cap_syhat_delta_q.getJSONArray("data")
 
     var data0 = data[0]
-    //val delta_q = FloatArray(4)
-    for (i in 0..3) {
-      var dval = (data0 as JSONArray).get(i)
-      yhat_delta_q[i] = (dval as Double).toFloat()
+    if (data0 is Double) {
+      // this is what we got in Fixed mode -- do not know why, but it is a experimental any way
+      for (i in 0..3) {
+        yhat_delta_q[i] = (data[i] as Double).toFloat()
+      }
+    } else {
+      //val delta_q = FloatArray(4)
+      for (i in 0..3) {
+        var dval = (data0 as JSONArray).get(i)
+        yhat_delta_q[i] = (dval as Double).toFloat()
+      }
     }
   }
 

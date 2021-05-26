@@ -2,33 +2,29 @@ package org.tensorflow.lite.examples.digitclassifier
 
 import android.content.Context
 import android.content.res.AssetManager
-import android.graphics.Bitmap
 import android.util.Log
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.TaskCompletionSource
 import org.json.JSONArray
-import org.tensorflow.lite.Interpreter
-import java.io.FileInputStream
 import java.io.IOException
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.channels.FileChannel
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 
 import org.json.JSONObject
-import org.tensorflow.lite.Tensor
-import java.nio.channels.NonReadableChannelException
 
 class MwModelSgnJson(private val context: Context) {
   private var fileName:String = ""
 
   private var root = JSONObject("{}")
 
-  private var input_x_gyro = -1
-  private var input_x_acc = -1
-  private var output_y_delta_p = -1
-  private var output_y_delta_q = -1
+  private var input_x_gyro_ndx = -1
+  private var input_x_gyro_shape = JSONArray()
+
+  private var input_x_acc_ndx = -1
+  private var input_x_acc_shape = JSONArray()
+
+  private var output_y_delta_p_ndx = -1
+  private var output_y_delta_p_shape = JSONArray()
+
+  private var output_y_delta_q_ndx = -1
+  private var output_y_delta_q_shape = JSONArray()
+
   private var model_description = ""
 
 
@@ -39,10 +35,18 @@ class MwModelSgnJson(private val context: Context) {
 
     root = JSONObject(cap_data_str)
 
-    input_x_gyro = root.getInt("input_x_gyro")
-    input_x_acc = root.getInt("input_x_acc")
-    output_y_delta_p = root.getInt("output_y_delta_p")
-    output_y_delta_q = root.getInt("output_y_delta_q")
+    input_x_gyro_ndx = root.getInt("input_x_gyro")
+    input_x_gyro_shape = root.getJSONObject("input_" + input_x_gyro_ndx.toString()).getJSONArray("shape")
+
+    input_x_acc_ndx = root.getInt("input_x_acc")
+    input_x_acc_shape = root.getJSONObject("input_" + input_x_acc_ndx.toString()).getJSONArray("shape")
+
+
+    output_y_delta_p_ndx = root.getInt("output_y_delta_p")
+    output_y_delta_p_shape = root.getJSONObject("output_" + output_y_delta_p_ndx.toString()).getJSONArray("shape")
+
+    output_y_delta_q_ndx = root.getInt("output_y_delta_q")
+    output_y_delta_q_shape = root.getJSONObject("output_" + output_y_delta_q_ndx.toString()).getJSONArray("shape")
 
 
     var model_size = root.getString("model_size")
@@ -68,20 +72,36 @@ class MwModelSgnJson(private val context: Context) {
     parse_data()
   }
 
-  fun get_input_x_gyro():Int {
-    return input_x_gyro
+  fun get_ndx_input_x_gyro():Int {
+    return input_x_gyro_ndx
   }
 
-  fun get_input_x_acc():Int {
-    return input_x_acc
+  fun get_input_x_gyro_shape(): JSONArray {
+    return input_x_gyro_shape
   }
 
-  fun get_output_y_delta_p():Int {
-    return output_y_delta_p
+  fun get_ndx_input_x_acc():Int {
+    return input_x_acc_ndx
   }
 
-  fun get_output_y_delta_q():Int {
-    return output_y_delta_q
+  fun get_input_x_acc_shape(): JSONArray {
+    return input_x_acc_shape
+  }
+
+  fun get_ndx_output_y_delta_p():Int {
+    return output_y_delta_p_ndx
+  }
+
+  fun get_output_y_delta_p_shape(): JSONArray {
+    return output_y_delta_p_shape
+  }
+
+  fun get_ndx_output_y_delta_q():Int {
+    return output_y_delta_q_ndx
+  }
+
+  fun get_output_y_delta_q_shape(): JSONArray {
+    return output_y_delta_p_shape
   }
 
   fun get_model_description(): String {

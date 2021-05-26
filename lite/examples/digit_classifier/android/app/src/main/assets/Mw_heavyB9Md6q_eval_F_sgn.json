@@ -104,10 +104,10 @@
         "tf.version": "2.5.0"
     },
     "git_version": {
-        "version": "0.0.10-58-g833f54a-dirty",
-        "full": "833f54a95fab8e29e8fec2abd1b5fab7627abda4-dirty"
+        "version": "0.0.10-82-g78c8353-dirty",
+        "full": "78c8353d92948b9bb791703b35eaa4f00ab4f4f7-dirty"
     },
-    "version_git": "0.0.10-58-g833f54a-dirty",
+    "version_git": "0.0.10-82-g78c8353-dirty",
     "version_tf": "2.5.0",
     "version_py": "3.7.10 (default, Feb 26 2021, 10:16:00) \n[Clang 10.0.0 ]",
     "feed_mode": "100Hz"
