@@ -81,26 +81,26 @@
         "sgn_order": 1
     },
     "output_y_delta_p": 1,
-    "model_name": "Mw_heavyC7Me6q_eval_P.tflite",
-    "model_size": 251932,
+    "model_name": "Mw_heavyC7Me6q_eval_F.tflite",
+    "model_size": 140240,
     "converter": {
         "converter": {
             "inference_input_type": "<dtype: 'float32'>",
             "inference_output_type": "<dtype: 'float32'>",
-            "optimizations": "set()",
-            "target_spec.supported_ops": "{<OpsSet.TFLITE_BUILTINS: 'TFLITE_BUILTINS'>}",
-            "target_spec.supported_types": "set()"
+            "optimizations": "[<Optimize.DEFAULT: 'DEFAULT'>]",
+            "target_spec.supported_ops": "[<OpsSet.TFLITE_BUILTINS: 'TFLITE_BUILTINS'>, <OpsSet.SELECT_TF_OPS: 'SELECT_TF_OPS'>]",
+            "target_spec.supported_types": "[tf.float16]"
         },
         "model": {
             "model.name": "pm_heavyC7Me6q",
             "model.size": 301512,
             "model.paper_name": null,
-            "tflite_model.size": 251932,
-            "tflite_model.downsize_ratio": "0.84"
+            "tflite_model.size": 140240,
+            "tflite_model.downsize_ratio": "0.47"
         },
-        "result": "tflite_mobile_models/Mw_heavyC7Me6q_eval_P.tflite",
-        "conversion_name": "Plain:No optimization",
-        "converter_klass": "<class 'e_tflite.ex_tfl_converter_plain.TflConverterPlain'>",
+        "result": "tflite_mobile_models/Mw_heavyC7Me6q_eval_F.tflite",
+        "conversion_name": "FP16|Float16 quantization",
+        "converter_klass": "<class 'e_tflite.ex_tfl_converter_fp16.TflConverterFP16'>",
         "tf.version": "2.5.0"
     },
     "git_version": {

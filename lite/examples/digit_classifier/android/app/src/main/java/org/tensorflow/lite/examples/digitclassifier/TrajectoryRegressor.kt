@@ -6,6 +6,7 @@ import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.TaskCompletionSource
 import org.tensorflow.lite.Interpreter
+import org.tensorflow.lite.Tensor
 import java.io.FileInputStream
 import java.io.IOException
 import java.nio.ByteBuffer
@@ -25,13 +26,13 @@ class TrajectoryRegressor(private val context: Context) {
   private var model_sgn_filename: String = ""
   private var model_description:String = ""
 
-  private var inputs = Array(2){Array(1){Array(200){FloatArray(3)}}}
-
   private var pumper: PumpMgr? = null
   private var mmsj: MwModelSgnJson? = null
 
-  private var selected_mode = "F"  //"P", "F", "I", "D"
+  private var selected_mode = "D"  //"P", "F", "D",  "I"
   private var selected_options_str = ""
+
+  private var fixed_batchsize = -1
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -76,50 +77,76 @@ class TrajectoryRegressor(private val context: Context) {
     return false
   }
 
-  private fun check_interpreter(interpreter: Interpreter): Boolean {
+  private fun tensor_signature(tensor: Tensor) {
+    var dtype = tensor.dataType()
+    var shape = tensor.shape()
+    var sgn = tensor.shapeSignature()
+    Log.i(TAG, dtype.toString() + "/" + shape.contentToString() + "/" + sgn.contentToString())
+  }
 
-    val input0_shape = arrayOf(1,200,3)
-    val input1_shape = arrayOf(1,200,3)
-    val output_p_shape = arrayOf(1,3)
-    val output_q_shape = arrayOf(1,4)
+  private fun check_interpreter_signature(interpreter: Interpreter): Boolean {
+
+    //Not fixed
+    //val input0_shape = arrayOf(1,200,3)
+    //val input1_shape = arrayOf(1,200,3)
+    //val output_p_shape = arrayOf(1,3)
+    //val output_q_shape = arrayOf(1,4)
+    //Fixed
+    //val input0_shape = arrayOf(10,200,3)
+    //val input1_shape = arrayOf(10,200,3)
+    //val output_p_shape = arrayOf(10,3)
+    //val output_q_shape = arrayOf(10,4)
+
+    var ndx_x_gyro = mmsj!!.get_ndx_input_x_gyro()
+    var ndx_x_acc = mmsj!!.get_ndx_input_x_acc()
 
     // Read input shape from model file
     //x_gyro dtype="FLOAT32" input0_shape(1, 200, 3)
-    var input0 = interpreter.getInputTensor(0)
-    //var input0_shape = input0.shape()
-    //var input0_sign = input0.shapeSignature()
+    var input_gyro = interpreter.getInputTensor(ndx_x_gyro)
+    Log.i(TAG, "x_gyro @" + ndx_x_gyro.toString())
+    tensor_signature(input_gyro)
 
     //x_acc dtype="FLOAT32"  input1_shape(1, 200, 3)
-    var input1 = interpreter.getInputTensor(1)
-    //var input1_shape = input1.shape()
-    //var input1_sign = input1.shapeSignature()
-
-    var ndx_y_delta_p = mmsj!!.get_output_y_delta_p()
-    var ndx_y_delta_q = mmsj!!.get_output_y_delta_q()
+    var input_acc = interpreter.getInputTensor(ndx_x_acc)
+    Log.i(TAG, "x_acc @" + ndx_x_acc.toString())
+    tensor_signature(input_acc)
 
 
-    //yhat_delta_q dtype="FLOAT32" output0_shape(1, 4)
-    var output_p = interpreter.getOutputTensor(ndx_y_delta_p)
-    //var output0_shape = output0.shape()
-    //var output0_sign = output0.shapeSignature()
+    var ndx_y_delta_p = mmsj!!.get_ndx_output_y_delta_p()
+    var ndx_y_delta_q = mmsj!!.get_ndx_output_y_delta_q()
 
     //yhat_delta_p dtype="FLOAT32" output1_shape(1, 3)
+    var output_p = interpreter.getOutputTensor(ndx_y_delta_p)
+    Log.i(TAG, "y_delta_p @" + ndx_y_delta_p.toString())
+    tensor_signature(output_p)
+
+    //yhat_delta_q dtype="FLOAT32" output0_shape(1, 4)
     var output_q = interpreter.getOutputTensor(ndx_y_delta_q)
-    //var output1_shape = output1.shape()
-    //var output1_sign = output1.shapeSignature()
+    Log.i(TAG, "y_delta_q @" + ndx_y_delta_q.toString())
+    tensor_signature(output_q)
 
-    var b1 = is_in_same_shape(input0.shape(), input0_shape)
-    var b2 = is_in_same_shape(input1.shape(), input1_shape)
-    var b3 = is_in_same_shape(output_p.shape(), output_p_shape)
-    var b4 = is_in_same_shape(output_q.shape(), output_q_shape)
+    var shape_tensor = input_gyro.shape()
+    var shape_mmsi = mmsj!!.get_input_x_gyro_shape()
+    Log.i(TAG, "shape_tensor: " + shape_tensor.contentToString())
+    Log.i(TAG, "shape mmsi: " + shape_mmsi.toString())
+    if(shape_tensor[0] != shape_mmsi[0]) {
+      Log.e(TAG, "shape mismatched")
+    }
+    if(shape_tensor[1] != shape_mmsi[1]) {
+      Log.e(TAG, "shape mismatched")
+    }
+    if(shape_tensor[2] != shape_mmsi[2]) {
+      Log.e(TAG, "shape mismatched")
+    }
 
-    Log.d(TAG, "CK:Input0_shape same? "  + b1.toString())
-    Log.d(TAG, "CK:Input1_shape same? "  + b2.toString())
-    Log.d(TAG, "CK:Output0_shape same? " + b3.toString())
-    Log.d(TAG, "CK:Output1_shape same? " + b4.toString())
+    if (shape_tensor[0] == 1) {
+      fixed_batchsize = 1
+    } else {
+      fixed_batchsize = shape_tensor[0]
+    }
+    Log.i(TAG, "fixed_batch_size " + fixed_batchsize.toString())
 
-    return b1 and b2 and b3 and b4
-
+    return true
   }
 
 
@@ -133,16 +160,19 @@ class TrajectoryRegressor(private val context: Context) {
     val options = Interpreter.Options()
 
     model_filename = getModelFileName()
+
     var iocs = ""
     if (model_filename.contains("_P.tflite")) {
-      iocs = "NNAPI/T4/FP16/BHO"
+      //iocs = "NNAPI/T4/BHO"
+      iocs = "XNNPACK/T4/BHO"
     } else if (model_filename.contains("_F.tflite")) {
       //iocs = "/NNAPI/T4/BHO"
       iocs = "/XNNPACK/T4/BHO"
-    } else if (model_filename.contains("_I.tflite")) {
-      iocs = "/NNAPI/T4"
     } else if (model_filename.contains("_D.tflite")) {
-      iocs = "/T4"
+      //iocs = "/NNAPI/T4/BHO"
+      iocs = "/XNNPACK/T4/BHO"
+    } else if (model_filename.contains("_I.tflite")) {
+      iocs = ""
     }
 
     //Ethan: disable NNAPI for now
@@ -186,7 +216,7 @@ class TrajectoryRegressor(private val context: Context) {
 
     val interpreter = Interpreter(model, options)
 
-    check_interpreter(interpreter)
+    check_interpreter_signature(interpreter)
 
     // Finish interpreter initialization
     this.interpreter = interpreter
@@ -260,19 +290,25 @@ class TrajectoryRegressor(private val context: Context) {
       return "FAIL: no new data"
     }
 
+    assert(fixed_batchsize > 0)
+
+    //prepare inputs
+    var ti_inputs = Array(2){Array(fixed_batchsize){Array(200){FloatArray(3)}}}
+
     //prepare inputs
     Log.i(TAG, "initial iputs")
-    pumper!!.feedInputs(inputs, round, mmsj!!)
-
-    var ndx_y_delta_p = mmsj!!.get_output_y_delta_p()
-    var ndx_y_delta_q = mmsj!!.get_output_y_delta_q()
+    pumper!!.feedInputs(ti_inputs, round, mmsj!!)
 
     //prepare outputs
-    var output0 = Array(1){FloatArray(4)}
-    var output1 = Array(1){FloatArray(3)}
-    var outputs = HashMap<Int, Array<FloatArray>>()
-    outputs.put(ndx_y_delta_q, output0)
-    outputs.put(ndx_y_delta_p, output1)
+    var ti_outputs = HashMap<Int, Array<FloatArray>>()
+
+    var ndx_y_delta_p = mmsj!!.get_ndx_output_y_delta_p()
+    var ndx_y_delta_q = mmsj!!.get_ndx_output_y_delta_q()
+
+    var output0 = Array(fixed_batchsize){FloatArray(4)}
+    var output1 = Array(fixed_batchsize){FloatArray(3)}
+    ti_outputs.put(ndx_y_delta_q, output0)
+    ti_outputs.put(ndx_y_delta_p, output1)
 
     //run estimation 100 times
     Log.i(TAG, "start")
@@ -281,13 +317,14 @@ class TrajectoryRegressor(private val context: Context) {
     var loopEstimation = pumper!!.loopEstimate()!!
     if (loopEstimation) {
       Log.d(TAG, "loop 100 times to check performance")
-      for (i in 0..100) {
-        interpreter?.runForMultipleInputsOutputs(inputs, outputs as Map<Int, Any>)
+      var max = 100 / fixed_batchsize
+      for (i in 0..max) {
+        interpreter?.runForMultipleInputsOutputs(ti_inputs, ti_outputs as Map<Int, Any>)
       }
 
     } else {
       Log.d(TAG, "make estimation by regressor")
-      interpreter?.runForMultipleInputsOutputs(inputs, outputs as Map<Int, Any>)
+      interpreter?.runForMultipleInputsOutputs(ti_inputs, ti_outputs as Map<Int, Any>)
     }
     var elapsedTime = (System.nanoTime() - startTime) / 1000000
 
@@ -296,7 +333,7 @@ class TrajectoryRegressor(private val context: Context) {
     var elapsedTimeMs = elapsedTime.toString()
     Log.i(TAG, "end: " + elapsedTimeMs +  " ms / 100 loop")
 
-    pumper!!.respOutputs(outputs, round, mmsj!!)
+    pumper!!.respOutputs(ti_outputs, round, mmsj!!)
 
     var estimate_result = ""
     estimate_result += "Span100: " + elapsedTimeMs + " ms/100loops\n"
