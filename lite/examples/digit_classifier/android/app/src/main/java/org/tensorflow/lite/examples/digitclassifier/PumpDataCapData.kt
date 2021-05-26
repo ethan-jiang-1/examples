@@ -1,23 +1,7 @@
 package org.tensorflow.lite.examples.digitclassifier
 
 import android.content.Context
-import android.content.res.AssetManager
-import android.graphics.Bitmap
 import android.util.Log
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.tasks.TaskCompletionSource
-import org.json.JSONArray
-import org.tensorflow.lite.Interpreter
-import java.io.FileInputStream
-import java.io.IOException
-import java.nio.ByteBuffer
-import java.nio.ByteOrder
-import java.nio.channels.FileChannel
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-
-import org.json.JSONObject
-import org.tensorflow.lite.Tensor
 
 class PumpCapData(private val context: Context): PumpDataBase() {
   private var fileName:String = ""
@@ -45,8 +29,8 @@ class PumpCapData(private val context: Context): PumpDataBase() {
     var x_gyro = capData!!.get_x_gyro()
     var x_acc  = capData!!.get_x_acc()
 
-    var ndx_x_gyro = mmsj!!.get_input_x_gyro()
-    var ndx_x_acc = mmsj!!.get_input_x_acc()
+    var ndx_x_gyro = mmsj!!.get_ndx_input_x_gyro()
+    var ndx_x_acc = mmsj!!.get_ndx_input_x_acc()
 
     for (i in 0..199) {
       for (j in 0..2) {
@@ -58,8 +42,8 @@ class PumpCapData(private val context: Context): PumpDataBase() {
   }
 
   override fun respOutputs(outputs:HashMap<Int, Array<FloatArray>>, round:Int, mmsj:MwModelSgnJson) {
-    var ndx_y_delta_p = mmsj!!.get_output_y_delta_p()
-    var ndx_y_delta_q = mmsj!!.get_output_y_delta_q()
+    var ndx_y_delta_p = mmsj!!.get_ndx_output_y_delta_p()
+    var ndx_y_delta_q = mmsj!!.get_ndx_output_y_delta_q()
 
     var yhat_delta_p = outputs.get(ndx_y_delta_p)?.get(0)
     var yhat_delta_q = outputs.get(ndx_y_delta_q)?.get(0)
