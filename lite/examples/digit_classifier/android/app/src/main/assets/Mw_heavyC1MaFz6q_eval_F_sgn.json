@@ -4,12 +4,12 @@
         "name": "serving_default_x2:0",
         "index": "0",
         "shape": [
-            1,
+            10,
             200,
             3
         ],
         "shape_signature": [
-            1,
+            10,
             200,
             3
         ],
@@ -25,12 +25,12 @@
         "name": "serving_default_x1:0",
         "index": "1",
         "shape": [
-            1,
+            10,
             200,
             3
         ],
         "shape_signature": [
-            1,
+            10,
             200,
             3
         ],
@@ -47,11 +47,11 @@
         "name": "StatefulPartitionedCall:1",
         "index": "132",
         "shape": [
-            1,
+            10,
             4
         ],
         "shape_signature": [
-            1,
+            10,
             4
         ],
         "dtype": "<class 'numpy.float32'>",
@@ -66,11 +66,11 @@
         "name": "StatefulPartitionedCall:0",
         "index": "125",
         "shape": [
-            1,
+            10,
             3
         ],
         "shape_signature": [
-            1,
+            10,
             3
         ],
         "dtype": "<class 'numpy.float32'>",
@@ -81,8 +81,8 @@
         "sgn_order": 1
     },
     "output_y_delta_p": 1,
-    "model_name": "Mw_heavyC1Ma6q_eval_F.tflite",
-    "model_size": 402160,
+    "model_name": "Mw_heavyC1MaFz6q_eval_F.tflite",
+    "model_size": 409696,
     "converter": {
         "converter": {
             "inference_input_type": "<dtype: 'float32'>",
@@ -92,22 +92,22 @@
             "target_spec.supported_types": "[tf.float16]"
         },
         "model": {
-            "model.name": "pm_heavyC1Ma6q",
-            "model.size": 832072,
-            "model.paper_name": "IMOT-t-m0(4x2)",
-            "tflite_model.size": 402160,
-            "tflite_model.downsize_ratio": "0.48"
+            "model.name": "pm_heavyC1MaFx6q",
+            "model.size": 832336,
+            "model.paper_name": null,
+            "tflite_model.size": 409696,
+            "tflite_model.downsize_ratio": "0.49"
         },
-        "result": "tflite_mobile_models/Mw_heavyC1Ma6q_eval_F.tflite",
+        "result": "tflite_mobile_models/Mw_heavyC1MaFz6q_eval_F.tflite",
         "conversion_name": "FP16|Float16 quantization",
         "converter_klass": "<class 'e_tflite.ex_tfl_converter_fp16.TflConverterFP16'>",
         "tf.version": "2.5.0"
     },
     "git_version": {
-        "version": "0.0.10-81-geaab15a-dirty",
-        "full": "eaab15a8b92ce99ec7bff714e8655b2e428aa9a2-dirty"
+        "version": "0.0.10-82-g78c8353-dirty",
+        "full": "78c8353d92948b9bb791703b35eaa4f00ab4f4f7-dirty"
     },
-    "version_git": "0.0.10-81-geaab15a-dirty",
+    "version_git": "0.0.10-82-g78c8353-dirty",
     "version_tf": "2.5.0",
     "version_py": "3.7.10 (default, Feb 26 2021, 10:16:00) \n[Clang 10.0.0 ]",
     "feed_mode": "100Hz"
