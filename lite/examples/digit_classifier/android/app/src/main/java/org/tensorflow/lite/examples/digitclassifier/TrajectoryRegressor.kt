@@ -169,8 +169,8 @@ class TrajectoryRegressor(private val context: Context) {
       //iocs = "/NNAPI/T4/BHO"
       iocs = "/XNNPACK/T4/BHO"
     } else if (model_filename.contains("_D.tflite")) {
-      //iocs = "/NNAPI/T4/BHO"
-      iocs = "/XNNPACK/T4/BHO"
+      iocs = "/NNAPI/T4/BHO"
+      //iocs = "/XNNPACK/T4/BHO"
     } else if (model_filename.contains("_I.tflite")) {
       iocs = ""
     }
