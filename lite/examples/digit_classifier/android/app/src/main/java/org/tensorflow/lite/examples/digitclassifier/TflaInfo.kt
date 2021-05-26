@@ -25,7 +25,6 @@ class TflaInfo(private val context: Context) {
 
   private var root = JSONObject("{}")
 
-
   private fun parse_data() {
     val assetManager = context.assets
 

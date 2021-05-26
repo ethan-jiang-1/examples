@@ -160,6 +160,7 @@ class TrajectoryRegressor(private val context: Context) {
     val options = Interpreter.Options()
 
     model_filename = getModelFileName()
+
     var iocs = ""
     if (model_filename.contains("_P.tflite")) {
       //iocs = "NNAPI/T4/BHO"

@@ -20,6 +20,7 @@ import org.json.JSONObject
 import org.tensorflow.lite.Tensor
 
 class TflaCapData(private val context: Context) {
+
   private var parsed: Boolean = false
   private var fileName:String = ""
 
