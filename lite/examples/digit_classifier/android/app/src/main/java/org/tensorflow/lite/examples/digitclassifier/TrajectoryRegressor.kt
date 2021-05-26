@@ -29,7 +29,7 @@ class TrajectoryRegressor(private val context: Context) {
   private var pumper: PumpMgr? = null
   private var mmsj: MwModelSgnJson? = null
 
-  private var selected_mode = "F"  //"P", "F", "D",  "I"
+  private var selected_mode = "D"  //"P", "F", "D",  "I"
   private var selected_options_str = ""
 
   private var fixed_batchsize = -1
@@ -166,10 +166,11 @@ class TrajectoryRegressor(private val context: Context) {
     } else if (model_filename.contains("_F.tflite")) {
       //iocs = "/NNAPI/T4/BHO"
       iocs = "/XNNPACK/T4/BHO"
+    } else if (model_filename.contains("_D.tflite")) {
+      //iocs = "/NNAPI/T4/BHO"
+      iocs = "/XNNPACK/T4/BHO"
     } else if (model_filename.contains("_I.tflite")) {
       iocs = "/NNAPI/T4"
-    } else if (model_filename.contains("_D.tflite")) {
-      iocs = "/T4"
     }
 
     //Ethan: disable NNAPI for now
