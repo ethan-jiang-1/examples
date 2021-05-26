@@ -29,7 +29,7 @@ class TrajectoryRegressor(private val context: Context) {
   private var pumper: PumpMgr? = null
   private var mmsj: MwModelSgnJson? = null
 
-  private var selected_mode = "D"  //"P", "F", "D",  "I"
+  private var selected_mode = "F"  //"P", "F", "D",  "I"
   private var selected_options_str = ""
 
   private var fixed_batchsize = -1
