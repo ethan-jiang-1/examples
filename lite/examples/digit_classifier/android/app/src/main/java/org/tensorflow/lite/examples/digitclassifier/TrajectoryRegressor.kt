@@ -360,6 +360,7 @@ class TrajectoryRegressor(private val context: Context) {
     return task.task
   }
 
+
   fun close() {
     Log.i(TAG, "TrajectoryRegressor:close")
     pumper = null
