@@ -33,6 +33,7 @@ class TrajectoryRegressor(private val context: Context) {
   private var selected_options_str = ""
 
   private var fixed_batchsize = -1
+  private var feed_shape_tensor = intArrayOf(3)
 
   fun initialize(cur_pumper: PumpMgr): Task<Void> {
     pumper = cur_pumper
@@ -126,6 +127,7 @@ class TrajectoryRegressor(private val context: Context) {
     tensor_signature(output_q)
 
     var shape_tensor = input_gyro.shape()
+    feed_shape_tensor = shape_tensor
     var shape_mmsi = mmsj!!.get_input_x_gyro_shape()
     Log.i(TAG, "shape_tensor: " + shape_tensor.contentToString())
     Log.i(TAG, "shape mmsi: " + shape_mmsi.toString())
@@ -311,33 +313,39 @@ class TrajectoryRegressor(private val context: Context) {
     ti_outputs.put(ndx_y_delta_p, output1)
 
     //run estimation 100 times
-    Log.i(TAG, "start")
     var startTime = System.nanoTime()
 
     var loopEstimation = pumper!!.loopEstimate()!!
+    var spanName = ""
+    var spanNum = 1
     if (loopEstimation) {
-      Log.d(TAG, "loop 100 times to check performance")
-      var max = 100 / fixed_batchsize
+      spanName = "span1000"
+      spanNum = 1000
+      Log.i(TAG, " start " + spanName + "...")
+      var max = 1000 / fixed_batchsize
       for (i in 0..max) {
         interpreter?.runForMultipleInputsOutputs(ti_inputs, ti_outputs as Map<Int, Any>)
       }
 
     } else {
-      Log.d(TAG, "make estimation by regressor")
+      spanName = "span1"
+      spanNum = 1
+      Log.i(TAG, "start " + spanName + "...")
       interpreter?.runForMultipleInputsOutputs(ti_inputs, ti_outputs as Map<Int, Any>)
     }
     var elapsedTime = (System.nanoTime() - startTime) / 1000000
 
-
     //get outputs out of estimation
     var elapsedTimeMs = elapsedTime.toString()
-    Log.i(TAG, "end: " + elapsedTimeMs +  " ms / 100 loop")
+    Log.i(TAG, spanName + " end: " + elapsedTimeMs +  " ms")
 
     pumper!!.respOutputs(ti_outputs, round, mmsj!!)
 
     var estimate_result = ""
-    estimate_result += "Span100: " + elapsedTimeMs + " ms/100loops\n"
-    estimate_result += "Comments\n"
+    estimate_result += spanName + ": " + elapsedTimeMs + " ms\n"
+    estimate_result += "LoopSpeed: " + (elapsedTimeMs.toFloat() / spanNum).toString() + " ms/loop\n"
+    estimate_result += "FixedBatchsize: " + fixed_batchsize.toString() + "\n"
+    estimate_result += "FeedShape:" + feed_shape_tensor.contentToString() + "\n"
     estimate_result += "Note\n"
     return estimate_result
   }
