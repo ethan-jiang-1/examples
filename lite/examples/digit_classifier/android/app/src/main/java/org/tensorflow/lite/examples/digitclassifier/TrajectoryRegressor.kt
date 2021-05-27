@@ -350,6 +350,7 @@ class TrajectoryRegressor(private val context: Context) {
     return estimate_result
   }
 
+
   fun estimateAsyc(est_mode:String): Task<String> {
     Log.i(TAG, "TrajectoryRegressor:estimateAsyc")
     val task = TaskCompletionSource<String>()
