@@ -51,6 +51,7 @@ class TrajectoryRegressor(private val context: Context) {
     return task.task
   }
 
+
   private fun selectInitModel() {
     var tfla_info = TflaInfo(context)
     tfla_info.parse("tfla_info.json")
